@@ -1,0 +1,77 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(clpy log4cl) :silent t)
+  )
+
+(log:config :debug)
+
+(defpackage :ros.script.function.3920134769
+  (:use :cl))
+(in-package :ros.script.function.3920134769)
+
+(defvar p-module)
+(defvar p-func)
+(defvar p-args)
+
+;;(defparameter argv '("multiply" "multiply" 3 2))
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (when (< (length argv) 2) (write-line "Usage: call python file funcname [args]" *error-output*) (return-from main 1))
+
+  (py:initialize)
+
+  (handler-case
+      (setf p-module (py:import-module (first argv)))
+    (py.exc:import-error (c)
+      (declare (ignore c))
+      (py:print-error)
+      (format *error-output* "Failed to load \"~A\"~%" (first argv))
+      (ros:quit 1)))
+
+  (setf p-func (py.object:get-attr p-module (second argv)))
+
+  (unless (and p-func (py:callable-check p-func))
+    (when (py:error-occurred)
+      (py:print-error))
+    (format *error-output* "Cannot find function \"~A\"~%" (second argv))
+    (py:dec-ref p-module)
+    (ros:quit 0))
+
+  (setf p-args (py.tuple:new (length (cddr argv))))
+  (loop for i in (cddr argv)
+        for index from 0
+        for n = (parse-integer i)
+        do (let ((p-value (py.long:new n)))
+             (unless p-value
+               (py:dec-ref p-args)
+               (py:dec-ref p-module)
+               (write-line "Cannot convert argument.")
+               (ros:quit 1))
+             (py.tuple:set-item p-args index p-value)))
+
+  (let ((p-value (py.object:call p-func p-args)))
+    (py:dec-ref p-args)
+    (if p-value
+        (progn
+          (format t "Result of call: ~A~%" (py.long:as-integer p-value))
+          (py:dec-ref p-value))
+        (progn
+          (py:dec-ref p-func)
+          (py:dec-ref p-module)
+          (py:print-error)
+          (ros:quit 1))
+        )
+    )
+
+  (py:dec-ref p-func)
+  (py:dec-ref p-module)
+
+  (unless (py:finalize)
+    (return-from main 120)))
+;;; vim: set ft=lisp lisp:

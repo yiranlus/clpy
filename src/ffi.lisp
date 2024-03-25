@@ -11,16 +11,19 @@
            :accessor-package :clpy.ffi.acc
            :function-package :clpy.ffi.fns
            :exclude-definitions ("^Py.*_Va"
+                                 "_Py.*_Va"
                                  "^Py.+V$"
                                  "vsnprintf$")
-           :symbol-exceptions (("PyObject_ASCII" . "OBJECT-ASCII")
-                               ("PyUnicode_AsASCIIString" . "UNICODE-AS-ASCII-STRING")
-                               ("PyUnicode_CompareWithASCIIString" . "UNICODE-COMPARE-WITH-ASCII-STRING")
-                               ("PyUnicode_DecodeASCII" . "UNICODE-DECODE-ASCII"))
-           :symbol-regex (("^Py(.*)"
-                           ()
-                           (cl:lambda (string matches regex)
-                             (autowrap:default-c-to-lisp (cl:aref matches 0)))))
+           :symbol-exceptions (("PyOS_FSPath" . "PY-OS-FS-PATH")
+                               ("PyObject_ASCII" . "PY-OBJECT-ASCII")
+                               ("PyUnicode_AsASCIIString" . "PY-UNICODE-AS-ASCII-STRING")
+                               ("PyUnicode_CompareWithASCIIString" . "PY-UNICODE-COMPARE-WITH-ASCII-STRING")
+                               ("PyUnicode_DecodeFSDefault" . "PY-UNICODE-DECODE-FS-DEFAULT")
+                               ("PyUnicode_EncodeFSDefault" . "PY-UNICODE-ENCODE-FS-DEFAULT")
+                               ("PyUnicode_DecodeFSDefaultAndSize" . "PY-UNICODE-DECODE-FS-DEFAULT-AND-SIZE")
+                               ("PyUnicode_DecodeASCII" . "PY-UNICODE-DECODE-ASCII")
+                               ("PyUnicode_FSConverter" . "PY-UNICODE-FS-CONVERTER")
+                               ("PyUnicode_FSDecoder" . "PY-UNICODE-FS-DECODER"))
            :sysincludes '("/usr/include/python3.11/")
            :exclude-sources ("/usr/include/"
                              "/usr/lib/")
@@ -30,5 +33,6 @@
                              "stddef.h"
                              "/usr/include/.*/bits/types.h"
                              "/usr/include/.*/bits/stdint-uintn.h"
+                             "/usr/include/.*/bits/stdint-intn.h"
                              "/usr/include/.*/sys/types.h")
-           :no-accessors cl:t)
+           :no-accessors cl:nil)
