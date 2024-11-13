@@ -17,7 +17,7 @@
 	   #:+= #:-= #:*= #:@= #:/= #://= #:**= #:%= #:~=
 	   #:and= #:or= #:xor= #:<<= #:<<=))
 
-(cl:in-package :clpy.number)
+(in-package :clpy.number)
 
 (clpy.type:define-type "PyLong_Type" long)
 (clpy.type:define-type "PyFloat_Type" float)
@@ -74,7 +74,7 @@
     (error 'py.exc:generic-error :message (format nil "Unable to create PyObject for ~A." n))))
 
 (defun p (o)
-  (plusp (clpy.ffi.fns:py-number-check)))
+  (plusp (clpy.ffi.fns:py-number-check o)))
 
 (defun as-double (o)
   (case (py.type:from (py:ob-type o))
@@ -84,8 +84,8 @@
 (defun real (o)
   (clpy.ffi.fns:py-complex-real-as-double o))
 
-(defun imag (op)
-  (clpy.ffi.fns:py-complex-imag-as-double op))
+(defun imag (o)
+  (clpy.ffi.fns:py-complex-imag-as-double o))
 
 (defun as-integer (o &optional (type :long) (mask nil))
   (unless (py.type:of o :long)

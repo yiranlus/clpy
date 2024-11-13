@@ -1,4 +1,4 @@
-(cl:in-package :clpy)
+(cl:in-package :clpy.core)
 
 (defun error-occurred ()
   "Test whether the error indicator is set. If set, return the exception TYPE. You not own a reference to the return value, so you do not need to PY:DEC-REF it."

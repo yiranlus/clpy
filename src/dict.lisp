@@ -33,81 +33,81 @@
 (clpy.type:define-type "PyDictProxy_Type" dict-proxy)
 
 (defun new (&optional mapping)
-  (let ((dict (py:ensure-null-as-nil
+  (let ((d (py:ensure-null-as-nil
 		  (clpy.ffi.fns:py-dict-new)
 		(error 'py.exc:generic-error :message "Unable to create new dict."))))
     (when mapping
       (loop for (k . v) in mapping
 	    do (py:let ((-k (py:new k))
 			(-v  (py:new v)))
-		 (set-item dict -k -v))))
-    dict))
+		 (set-item d -k -v))))
+    d))
 
-(defun new-proxy (dict)
+(defun new-proxy (o)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-proxy-new dict)
+      (clpy.ffi.fns:py-dict-proxy-new o)
     (error 'py.exc:generic-error)))
 
-(defun clear (dict)
-  (clpy.ffi.fns:py-dict-clear dict))
+(defun clear (o)
+  (clpy.ffi.fns:py-dict-clear o))
 
-(defun contains (dict key)
+(defun contains (o key)
   (case (py:let ((-key (py:new key)))
-	  (clpy.ffi.fns:py-dict-contains dict -key))
+	  (clpy.ffi.fns:py-dict-contains o -key))
     (1 t)
     (0 nil)
     (-1 (error 'py.exc:generic-error))))
 
-(defun copy (dict)
+(defun copy (o)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-copy dict)
+      (clpy.ffi.fns:py-dict-copy o)
     (error 'py.exc:generic-error)))
 
-(defun set-item (dict key val)
+(defun set-item (o key value)
   (py:ensure-non-negative
       (if (stringp key)
-	  (py:let ((-val (py:new val)))
-	    (clpy.ffi.fns:py-dict-set-item-string dict key -val))
+	  (py:let ((-value (py:new value)))
+	    (clpy.ffi.fns:py-dict-set-item-string o key -value))
 	  (py:let ((-key (py:new key))
-		   (-val (py:new val)))
-	    (clpy.ffi.fns:py-dict-set-item dict -key -val)))
+		   (-value (py:new value)))
+	    (clpy.ffi.fns:py-dict-set-item o -key -value)))
     (error 'py.exc:generic-error
 	   :message (format nil "Unable to set item with key ~A to ~A."
 			    key value))))
 
-(defun del-item (dict key)
+(defun del-item (o key)
   (py:ensure-non-negative
       (if (stringp key)
-	  (clpy.ffi.fns:py-dict-del-item-string dict key)
+	  (clpy.ffi.fns:py-dict-del-item-string o key)
 	  (py:let ((-key (py:new key)))
-	    (clpy.ffi.fns:py-dict-del-item dict -key)))
+	    (clpy.ffi.fns:py-dict-del-item o -key)))
     (error 'py.exc:generic-error)))
 
-(defun get-item (dict key &optional new-ref)
+(defun get-item (o key &optional new-ref)
   (py:ensure-null-as-nil
       (if (stringp key)
-	  (clpy.ffi.fns:py-dict-get-item-string dict key)
-	  (clpy.ffi.fns:py-dict-get-item dict key))
+	  (clpy.ffi.fns:py-dict-get-item-string o key)
+	  (clpy.ffi.fns:py-dict-get-item o key))
     (error 'py.exc:generic-error)))
 
-(defun items (dict)
+(defun items (o)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-items dict)
+      (clpy.ffi.fns:py-dict-items o)
     (error 'py.exc:generic-error)))
 
-(defun keys (dict)
+(defun keys (o)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-keys dict)
+      (clpy.ffi.fns:py-dict-keys o)
     (error 'py.exc:generic-error)))
 
-(defun values (dict)
+(defun values (o)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-values dict)
+      (clpy.ffi.fns:py-dict-values o)
     (error 'py.exc:generic-error)))
 
-(defun size (dict)
+(defun size (o)
   (py:ensure-non-negative
-      (clpy.ffi.fns:py-dict-size dict)
+      (clpy.ffi.fns:py-dict-size o)
     (error 'py.exc:generic-error)))
 
 (defun merge (dict-a dict-or-seq &key override)
@@ -123,8 +123,8 @@
 				     (type-of dict-or-seq))))))
     (error 'py.exc:generic-error)))
 
-(defun update (dict-a dict-b &key override)
+(defun update (o dict &key override)
   (py:ensure-zero
-      (clpy.ffi.fns:py-dict-update dict-a dict-b)
+      (clpy.ffi.fns:py-dict-update o dict)
     (error 'py.exc:generic-error)))
 

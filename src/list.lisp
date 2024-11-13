@@ -24,35 +24,35 @@
 (defun size (o)
   (clpy.ffi.fns:py-list-size o))
 
-(defun get-item (o i)
+(defun get-item (o index)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-list-get-item o i)
+      (clpy.ffi.fns:py-list-get-item o index)
     (error 'py.exc:generic-error)))
 
-(defun set-item (o i v)
+(defun set-item (o index value)
   (py:ensure-zero
-      (py:let ((-v (py:new v)))
-	(clpy.ffi.fns:py-list-set-item o i -v))
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-list-set-item o index -value))
     (error 'py.exc:generic-error)))
 
-(defun insert (o i v)
+(defun insert (o index value)
   (py:ensure-zero
-      (py:let ((-v (py:new v)))
-	(clpy.ffi.fns:py-list-insert o i -v))
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-list-insert o index -value))
     (error 'py.exc:generic-error)))
 
-(defun append (o v)
+(defun append (o value)
   (py:ensure-zero
-      (py:let ((-v (py:new v)))
-	(clpy.ffi.fns:py-list-append o -v))
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-list-append o -value))
     (error 'py.exc:generic-error)))
 
-(defun get-slice (o l h)
-  (clpy.ffi.fns:py-list-get-slice o l h))
+(defun get-slice (o low high)
+  (clpy.ffi.fns:py-list-get-slice o low high))
 
-(defun set-slize (o l h v)
+(defun set-slize (o low high value)
   (py:ensure-zero
-      (clpy.ffi.fns:py-list-set-slice o l h v)
+      (clpy.ffi.fns:py-list-set-slice o low high value)
     (error 'py.exc:generic-error)))
 
 (defun sort (o)

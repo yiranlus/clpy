@@ -3,6 +3,7 @@
   (:use :cl)
   (:shadow #:replace #:find #:count)
   (:export #:new
+	   #:p
 	   #:encode
 	   #:concat
 	   #:split
@@ -18,6 +19,9 @@
 (cl:in-package :clpy.str)
 
 (clpy.type:define-type "PyUnicode_Type" str)
+
+(defun p (o)
+  (clpy.type:of o :str))
 
 (defun new (str &optional (encoding :fs-default) &key errors stateful byte-order mapping)
   (let ((-errors (if errors errors (cffi:null-pointer)))

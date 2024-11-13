@@ -1,15 +1,23 @@
-(cl:defpackage :clpy.sequence
+(defpackage :clpy.sequence
   (:nicknames :py.seq)
   (:use :cl)
   (:shadow #:list #:count)
-  (:export #:p))
+  (:export #:p
+	   #:size
+	   #:concat #:concat=
+	   #:repeat #:repeat=
+	   #:get-item #:get-slice
+	   #:set-item #:set-slice
+	   #:del-item #:del-slice
+	   #:count #:contains #:index #:in
+	   #:list #:tuple))
 
-(cl:in-package :clpy.sequence)
+(in-package :clpy.sequence)
 
 ;; sequence protocol
 
 (defun p (o)
-  (plusp (clpy.ffi.fns:py-sequence-check)))
+  (plusp (clpy.ffi.fns:py-sequence-check o)))
 
 (defun size (o)
   (py:ensure-non-negative
@@ -46,19 +54,21 @@
       (clpy.ffi.fns:py-sequence-get-slice o i1 i2)
     (error 'py.exc:generic-error)))
 
-(defun set-item (o i v)
+(defun set-item (o index value)
   (py:ensure-zero
-      (clpy.ffi.fns:py-sequence-set-item o i v)
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-sequence-set-item o index -value))
     (error 'py.exc:generic-error)))
 
-(defun del-item (o i)
+(defun del-item (o index)
   (py:ensure-zero
-      (clpy.ffi.fns:py-sequence-del-item o i)
+      (clpy.ffi.fns:py-sequence-del-item o index)
     (error 'py.exc:generic-error)))
 
-(defun set-slice (o i1 i2 v)
+(defun set-slice (o i1 i2 value)
   (py:ensure-zero
-      (clpy.ffi.fns:py-sequence-set-slice o i1 i2 v)
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-sequence-set-slice o i1 i2 -value))
     (error 'py.exc:generic-error)))
 
 (defun del-slice (o i1 i2)
@@ -68,22 +78,26 @@
 
 (defun count (o value)
   (py:ensure-non-negative
-      (clpy.ffi.fns:py-sequence-count o value)
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-sequence-count o -value))
     (error 'py.exc:generic-error)))
 
 (defun contains (o value)
-  (case (clpy.ffi.fns:py-sequence-contains o value)
+  (case (py:let ((-value (py:new value)))
+	  (clpy.ffi.fns:py-sequence-contains o -value))
     (1 t)
     (0 nil)
     (-1 (error 'py.exc:generic-error))))
 
 (defun index (o value)
   (py:ensure-non-negative
-      (clpy.ffi.fns:py-sequence-index o value)
+      (py:let ((-value (py:new value)))
+	(clpy.ffi.fns:py-sequence-index o -value))
     (error 'py.exc:generic-error)))
 
 (defun in (o value)
-  (case (clpy.ffi.fns:py-sequence-in o value)
+  (case (py:let ((-value (py:new value)))
+	  (clpy.ffi.fns:py-sequence-contains o -value))
     (1 t)
     (0 nil)
     (-1 (error 'py.exc:generic-error))))
@@ -91,6 +105,11 @@
 (defun list (o)
   (py:ensure-null-as-nil
       (clpy.ffi.fns:py-sequence-list o)
+    (error 'py.exc:generic-error)))
+
+(defun tuple (o)
+  (py:ensure-null-as-nil
+      (clpy.ffi.fns:py-sequence-tuple o)
     (error 'py.exc:generic-error)))
 
 ;; iteratable object

@@ -6,6 +6,10 @@
 
 (in-suite unicode-test)
 
+(test string-type-test
+  (py:let ((x (py.str:new "lsjdflkj")))
+    (is-true (py.str:p x))))
+
 (test get-and-retrive
   (py:let ((x (py.str:new "this is a string.")))
     (is (string-equal

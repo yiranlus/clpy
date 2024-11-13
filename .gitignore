@@ -17,5 +17,6 @@
 *.wx64fsl
 *.wx32fsl
 *~
+.\#*.lisp
 \#*.lisp#
 __pycache__

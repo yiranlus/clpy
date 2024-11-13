@@ -14,24 +14,27 @@
                (:module clpy-lib
                 :pathname "lib")
                (:module "src"
-                :components ((:file "library")
+                :components ((:file "utils")
+			     
+			     (:file "library")
                              (:file "ffi" :depends-on ("library"))
+			     (:file "object" :depends-on ("ffi"))
 
-			     (:file "utils")
-                             (:file "package" :depends-on ("ffi" "utils"))
-			     (:file "pylet" :depends-on ("package"))
-			     (:file "refcnt" :depends-on ("package" "types"))
+                             (:file "package" :depends-on ("ffi" "utils" "object"))
 			     (:file "runtime" :depends-on ("package"))
 			     (:file "initfinal" :depends-on ("package"))
+
+			     (:file "pylet" :depends-on ("package" "object"))
 			     
                              (:file "types" :depends-on ("ffi"))
                              (:file "exception" :depends-on ("ffi"))
                              (:file "error" :depends-on ("exception" "utils"))
                              (:file "number" :depends-on ("ffi" "types" "utils"))
 			     
-			     (:file "object" :depends-on ("ffi"))
+			     (:file "object-basic" :depends-on ("package" "object" "types"))
 			     (:file "object-attr" :depends-on ("object" "utils" "error"))
 			     (:file "object-repr" :depends-on ("object" "utils" "error"))
+			     (:file "object-ops" :depends-on ("object" "utils" "error"))
 			     (:file "object-compare" :depends-on ("object" "utils" "error"))
 			     
 			     (:file "bool" :depends-on ("types" "utils" "error"))
@@ -76,7 +79,8 @@
 	       (:file "unicode" :depends-on ("package"))
 	       (:file "object" :depends-on ("package"))
 	       (:file "set" :depends-on ("package"))
-	       (:file "dict" :depends-on ("package")))
+	       (:file "dict" :depends-on ("package"))
+	       (:file "smart" :depends-on ("package")))
   :perform (test-op (op c)
                     (symbol-call :fiveam :run!
                                  (find-symbol* :clpy :clpy.test))))

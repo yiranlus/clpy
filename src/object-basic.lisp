@@ -1,4 +1,4 @@
-(in-package :clpy.core)
+(in-package :clpy.object)
 
 (defun object-p (obj)
   (typep obj 'clpy.ffi:py-object))

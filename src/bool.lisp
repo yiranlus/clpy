@@ -1,9 +1,9 @@
-(cl:defpackage :clpy.bool
+(defpackage :clpy.bool
   (:nicknames :py.bool)
   (:use :cl)
   (:export #:new))
 
-(cl:in-package :clpy.bool)
+(in-package :clpy.bool)
 
 (clpy.type:define-type "PyBool_Type" bool)
 

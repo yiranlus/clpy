@@ -8,16 +8,6 @@
   (:export #:initialize
 	   #:is-initialized
 	   #:finalize
-	   ;; object
-	   #:object-p
-	   #:ob-refcnt
-	   #:ob-type
-	   #:new-ref
-	   #:new-xref
-           #:inc-ref
-	   #:inc-xref
-           #:dec-ref
-	   #:dec-xref
 	   ;; runtime
 	   #:encode-locale
            #:decode-locale
@@ -41,8 +31,10 @@
 
 (defpackage :clpy
   (:nicknames :py)
-  (:use :clpy.core :clpy.pylet :clpy.util :clpy.smart)
+  (:use :clpy.core :clpy.object :clpy.pylet :clpy.util :clpy.smart)
   (:export #:new
+
+	   ;; PyObject
 	   #:object-p
 	   #:ob-refcnt
 	   #:ob-type
@@ -52,7 +44,8 @@
 	   #:inc-xref
            #:dec-ref
 	   #:dec-xref
-	   
+
+	   ;; initialization and finalization
            #:initialize
            #:is-initialized
            #:finalize
@@ -73,10 +66,11 @@
            #:get-build-info
            #:set-python-home
            #:get-python-home
+	   
            ;;#:import-module ;; import.lisp
-           ;;#:clear-error ;; error.lisp
-           ;;#:print-error
-           ;;#:error-occurred
+           #:clear-error ;; error.lisp
+           #:print-error
+           #:error-occurred
 
 	   ;; clpy.util
 	   #:ensure-null-as-nil

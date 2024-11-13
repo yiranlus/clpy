@@ -8,6 +8,6 @@
 
 (test create-bool
   (py:let ((v (py.bool:new nil)))
-    (is-true (py.object:is-false v)))
+    (is-true (py.obj:is-false v)))
   (py:let ((v (py.bool:new t)))
-    (is-true (py.object:is-true v))))
+    (is-true (py.obj:is-true v))))

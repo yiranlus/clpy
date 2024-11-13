@@ -1,4 +1,4 @@
-(cl:defpackage :clpy.set
+(defpackage :clpy.set
   (:nicknames :py.set)
   (:use :cl)
   (:shadow #:pop)
@@ -11,7 +11,7 @@
 	   #:contains
 	   #:pop))
 
-(cl:in-package :clpy.set)
+(in-package :clpy.set)
 
 (clpy.type:define-type "PySet_Type" set)
 

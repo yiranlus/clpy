@@ -1,8 +1,19 @@
 (defpackage :clpy.object
-  (:nicknames :py.object)
+  (:nicknames :py.obj)
   (:use :cl)
   (:shadow #:format #:type)
-  (:export #:has-attr
+  (:export #:object-p
+	   #:ob-refcnt
+	   #:ob-type
+	   #:new-ref
+	   #:new-xref
+           #:inc-ref
+	   #:inc-xref
+           #:dec-ref
+	   #:dec-xref
+
+	   ;; attr
+	   #:has-attr
            #:get-attr
            #:set-attr
            ;;#:generic-get-attr
@@ -23,8 +34,8 @@
            #:is-false
            ;;#:type
            ;;#:size
-           ;;#:get-item
-           ;;#:set-item
+           #:get-item
+           #:set-item
            ;;#:del-item
            ;;#:dir
            ;;#:get-iter
