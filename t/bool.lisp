@@ -6,6 +6,10 @@
 
 (in-suite bool-test)
 
+(test test-bool-type
+  (py:let ((v (py.bool:new nil)))
+    (is-true (py.bool:p v))))
+
 (test create-bool
   (py:let ((v (py.bool:new nil)))
     (is-true (py.obj:is-false v)))
