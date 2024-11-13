@@ -23,7 +23,11 @@
            #:get-compiler
            #:get-build-info
            #:set-python-home
-           #:get-python-home))
+           #:get-python-home
+	   ;; error
+	   #:clear-error ;; error.lisp
+           #:print-error
+           #:error-occurred))
 
 (defpackage :clpy.smart
   (:use :cl)

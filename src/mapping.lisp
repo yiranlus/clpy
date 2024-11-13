@@ -1,7 +1,7 @@
 (defpackage :clpy.mapping
   (:nicknames :py.map)
   (:use :cl)
-  (:shadow #:list #:count)
+  (:shadow #:values)
   (:export #:p
 	   #:size
 	   #:get-item
@@ -39,9 +39,8 @@
 
 (defun del-item (o key)
   (py:ensure-zero
-      (if (stringp key)
-	  (clpy.ffi.fns:py-mapping-del-item-string o key)
-	  (py.obj:del-item o key))
+      (py:let ((-key (py:new key)))
+	  (py.obj:del-item o -key))
     (error 'py.exc:generic-error)))
 
 (defun has-key (o key)
@@ -65,3 +64,4 @@
   (py:ensure-null-as-nil
       (clpy.ffi.fns:py-mapping-items o)
     (error 'py.exc:generic-error)))
+

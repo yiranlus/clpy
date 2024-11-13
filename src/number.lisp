@@ -1,5 +1,5 @@
 (defpackage :clpy.number
-  (:nicknames :py.number)
+  (:nicknames :py.num)
   (:use :cl)
   (:shadow #:abs #:real #:+ #:- #:* #:/ #:// #:** #:/=
 	   #:int #:float #:and #:or #:xor)

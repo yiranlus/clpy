@@ -3,6 +3,7 @@
   (:use :cl)
   (:shadow #:values #:merge)
   (:export #:new
+	   #:p
 	   #:new-proxy
 	   #:clear
 	   #:contains
@@ -32,7 +33,7 @@
 
 (clpy.type:define-type "PyDictProxy_Type" dict-proxy)
 
-(defun new (&optional mapping)
+(defun new (&rest mapping)
   (let ((d (py:ensure-null-as-nil
 		  (clpy.ffi.fns:py-dict-new)
 		(error 'py.exc:generic-error :message "Unable to create new dict."))))
@@ -42,6 +43,9 @@
 			(-v  (py:new v)))
 		 (set-item d -k -v))))
     d))
+
+(defun p (o)
+  (clpy.type:of o :dict))
 
 (defun new-proxy (o)
   (py:ensure-null-as-nil

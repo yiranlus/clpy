@@ -2,7 +2,8 @@
 
 (defun error-occurred ()
   "Test whether the error indicator is set. If set, return the exception TYPE. You not own a reference to the return value, so you do not need to PY:DEC-REF it."
-  (py.exc:from (clpy.util:ensure-null-as-nil (clpy.ffi.fns:py-err-occurred))))
+  (py.exc:from (py:ensure-null-as-nil
+		   (clpy.ffi.fns:py-err-occurred))))
 
 (defun clear-error ()
   "Clear the error indicator. If the error indicator is not set, there is no effect."

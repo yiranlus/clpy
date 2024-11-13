@@ -2,7 +2,8 @@
   (:nicknames :py.list)
   (:use :cl)
   (:shadow #:append #:sort #:reverse)
-  (:export #:new-of
+  (:export #:p
+	   #:new-of
 	   #:new
 	   #:size
 	   #:get-item
@@ -20,6 +21,9 @@
 (clpy.type:define-type "PyList_Type" list)
 (clpy.type:define-type "PyListIter_Type" list-iter)
 (clpy.type:define-type "PyListRevIter_Type" list-rev-iter)
+
+(defun p (o)
+  (clpy.type:of o :list))
 
 (defun size (o)
   (clpy.ffi.fns:py-list-size o))
@@ -78,6 +82,6 @@
   (let ((l (new-of (length items))))
     (loop for i in items
 	  for index from 0
-	  do (py:let ((py-i (py:new i)))
+	  do (let ((py-i (py:new i)))
 	       (set-item l index py-i)))
     l))

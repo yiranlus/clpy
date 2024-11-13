@@ -27,7 +27,8 @@
 
 (cl:defun from (py-exc)
   "Return the corresponding keyword to the Python exception."
-  (cl:car (cl:rassoc py-exc *assoc-excs* :test #'cffi:pointer-eq)))
+  (cl:when py-exc
+    (cl:car (cl:rassoc py-exc *assoc-excs* :test #'cffi:pointer-eq))))
 
 (cl:defun get (kw)
   (cl:cdr (cl:assoc kw *assoc-excs*)))

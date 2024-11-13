@@ -19,6 +19,6 @@
 
 (defun del-item (o key)
  "Remove the mapping from the object KEY from the object O."
- (py:ensure-non-negative
-     (clpy.ffi.fns:py-object-del-item o key)
+  (py:ensure-non-negative
+      (clpy.ffi.fns:py-object-del-item o key)
    (error 'py.exc:python-error)))

@@ -43,7 +43,9 @@
 			     (:file "unicode" :depends-on ("types" "utils" "error"))
 			     (:file "set" :depends-on ("types" "utils" "pylet" "error"))
 			     (:file "dict" :depends-on ("types" "utils" "pylet" "sequence" "error"))
+			     
 			     (:file "sequence" :depends-on ("types" "utils" "pylet"))
+			     (:file "mapping" :depends-on ("types" "utils" "pylet" "object"))
 			     (:file "smart" :depends-on ("package" "number" "list" "unicode"))
                              
                              ;;(:file "object" :depends-on ("clpy"))
