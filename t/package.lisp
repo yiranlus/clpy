@@ -1,8 +1,9 @@
 (defpackage :clpy.test
   (:use :cl :fiveam
-        :plus-c))
+        :plus-c)
+  (:export #:clpy))
 
 (in-package :clpy.test)
 
-(def-suite clpy.test
-  :description "Test CLPY system")
+(def-suite clpy
+  :description "Top-level test suite.")

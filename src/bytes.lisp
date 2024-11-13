@@ -1,29 +1,33 @@
-(defpackage :clpy.bytes
+(cl:defpackage :clpy.bytes
   (:nicknames :py.bytes)
-  (:use :cl))
+  (:use :cl)
+  (:export #:new
+	   #:as-string
+	   #:concat
+	   #:size))
 
-(in-package :clpy.bytes)
+(cl:in-package :clpy.bytes)
 
-(cffi:defcvar "PyBytes_Type" :int)
-(defconstant +type+ (cffi:get-var-pointer '*pybytes-type*))
+(clpy.type:define-type "PyBytes_Type" bytes)
 
-(defun from-string (v)
-  (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-bytes-from-string v)
+(defun new (v)
+  (clpy.util:ensure-null-as-nil
+      (if (stringp v)
+	  (clpy.ffi.fns:py-bytes-from-string v)
+	  (clpy.ffi.fns:py-bytes-from-object v))
     (error 'py.exc:python-error)))
 
 (defun as-string (o)
   (multiple-value-bind (res ptr)
       (clpy.ffi.fns:py-bytes-as-string o)
     (when (cffi:null-pointer-p ptr)
-      (error 'py.exc:type-error))
+      (error 'py.exc:generic-error))
     res))
 
-(defun from-object (o)
-  (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-bytes-from-object o)))
+(defun size (o)
+  (clpy.ffi.fns:py-bytes-size o))
 
-(defun concat (bytes newpart &key (del t))
-  (if del
+(defun concat (bytes newpart &key (delete t))
+  (if delete
       (clpy.ffi.fns:py-bytes-concat-and-del (autowrap:ptr bytes) newpart)
       (clpy.ffi.fns:py-bytes-concat (autowrap:ptr bytes) newpart)))

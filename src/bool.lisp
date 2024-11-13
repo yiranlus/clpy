@@ -1,14 +1,13 @@
-(defpackage :clpy.bool
+(cl:defpackage :clpy.bool
   (:nicknames :py.bool)
   (:use :cl)
-  (:export #:+type+
-           #:from-long))
+  (:export #:new))
 
-(in-package :clpy.bool)
+(cl:in-package :clpy.bool)
 
-(cffi:defcvar "PyBool_Type" :int)
-(defconstant +type+ (cffi:get-var-pointer '*pybool-type*))
+(clpy.type:define-type "PyBool_Type" bool)
 
-(defun from-long (v)
-  (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-bool-from-long v)))
+(defun new (&optional (v nil))
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-bool-from-long (if v 1 0))
+    (error 'py.exc:generic-error)))

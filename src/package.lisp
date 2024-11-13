@@ -1,21 +1,69 @@
+(defpackage :clpy.pylet
+  (:use :cl)
+  (:shadow #:let #:let*)
+  (:export #:let #:let*))
+
+(defpackage :clpy.core
+  (:use :cl :plus-c)
+  (:export #:initialize
+	   #:is-initialized
+	   #:finalize
+	   ;; object
+	   #:object-p
+	   #:ob-refcnt
+	   #:ob-type
+	   #:new-ref
+	   #:new-xref
+           #:inc-ref
+	   #:inc-xref
+           #:dec-ref
+	   #:dec-xref
+	   ;; runtime
+	   #:encode-locale
+           #:decode-locale
+           #:set-program-name
+           #:get-program-name
+           #:get-prefix
+           #:get-exec-prefix
+           #:get-path
+           #:get-program-full-path
+           #:get-version
+           #:get-platform
+           #:get-copyright
+           #:get-compiler
+           #:get-build-info
+           #:set-python-home
+           #:get-python-home))
+
+(defpackage :clpy.smart
+  (:use :cl)
+  (:export #:new))
+
 (defpackage :clpy
   (:nicknames :py)
-  (:use :cl :plus-c
-        :trivia)
-  (:export #:ensure-null-as-nil
-           #:ensure-zero
-           #:ensure-non-negative
+  (:use :clpy.core :clpy.pylet :clpy.util :clpy.smart)
+  (:export #:new
+	   #:object-p
+	   #:ob-refcnt
+	   #:ob-type
+	   #:new-ref
+	   #:new-xref
+           #:inc-ref
+	   #:inc-xref
+           #:dec-ref
+	   #:dec-xref
+	   
            #:initialize
            #:is-initialized
            #:finalize
-           ;; locale
+	   
+           ;; runtime.lisp
            #:encode-locale
            #:decode-locale
            #:set-program-name
            #:get-program-name
            #:get-prefix
            #:get-exec-prefix
-           #:set-path
            #:get-path
            #:get-program-full-path
            #:get-version
@@ -25,34 +73,16 @@
            #:get-build-info
            #:set-python-home
            #:get-python-home
-           #:import-module ;; import.lisp
-           #:clear-error ;; error.lisp
-           #:print-error
-           #:error-occurred
-           #:new-ref ;; refcnt.lisp
-           #:inc-ref
-           #:dec-ref
-           #:callable-check ;; call.lisp
+           ;;#:import-module ;; import.lisp
+           ;;#:clear-error ;; error.lisp
+           ;;#:print-error
+           ;;#:error-occurred
+
+	   ;; clpy.util
+	   #:ensure-null-as-nil
+	   #:ensure-zero
+	   #:ensure-non-negative
+
+	   ;; clpy.pylet
+	   #:let #:let*
            ))
-
-(in-package :clpy)
-
-(defmacro ensure-null-as-nil (value &body body)
-  (let ((res (gensym)))
-    `(let ((,res ,value))
-       (if (not (cffi:null-pointer-p (autowrap:ptr ,res)))
-           ,res
-           (progn ,@body)))))
-
-(defmacro ensure-zero (value &body body)
-  (let ((res (gensym)))
-    `(let ((,res (zerop ,value)))
-       (or ,res
-           (progn ,@body)))))
-
-(defmacro ensure-non-negative (value &body body)
-  (let ((res (gensym)))
-    `(let ((,res ,value))
-       (if (not (minusp ,res))
-           ,res
-           (progn ,@body)))))
