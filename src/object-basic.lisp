@@ -3,15 +3,20 @@
 (defun object-p (obj)
   (typep obj 'clpy.ffi:py-object))
 
+(clpy.smart:smart-hook #'object-p
+                       (lambda (x)
+                         (inc-xref x)
+                         x))
+
 ;; PyObject basic operations
 
 (defun ob-refcnt (obj)
   "Return ob_refcnt of the PyObject."
-  (c-ref obj clpy.ffi:py-object :ob-refcnt))
+  (clpy.ffi.acc:py-object.ob-refcnt obj))
 
 (defun ob-type (obj)
   "Return ob_type of the PyObject."
-  (let ((pto (c-ref obj clpy.ffi:py-object :ob-type)))
+  (let ((pto (clpy.ffi.acc:py-object.ob-type obj)))
     (or (clpy.type:from pto) pto)))
 
 (defun new-ref (o)

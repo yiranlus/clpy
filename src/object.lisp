@@ -1,6 +1,6 @@
 (defpackage :clpy.object
   (:nicknames :py.obj)
-  (:use :cl :plus-c)
+  (:use :cl)
   (:shadow #:format #:type)
   (:export #:object-p
 	   #:ob-refcnt
@@ -40,5 +40,6 @@
            ;;#:dir
            ;;#:get-iter
            ;;#:get-a-iter
-           ;;#:call ;; call.lisp
+           ;; callable
+           #:call
            ))

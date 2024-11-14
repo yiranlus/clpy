@@ -11,10 +11,10 @@
 (py:initialize)
 
 (defparameter a -3)
-(defparameter a-py (py.number:new a))
-(defparameter b-py (py.number:abs a-py))
+(defparameter a-py (py.num:new a))
+(defparameter b-py (py.num:abs a-py))
 
-(format t "The result of abs(~A) is ~A.~%" a (py.number:as-double b-py))
+(format t "The result of abs(~A) is ~A.~%" a (py.num:as-integer b-py))
 
 (py:dec-ref b-py)
 (py:dec-ref a-py)

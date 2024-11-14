@@ -2,7 +2,7 @@
   (:nicknames :py.bool)
   (:use :cl)
   (:export #:new
-	   #:p))
+           #:p))
 
 (in-package :clpy.bool)
 

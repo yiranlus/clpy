@@ -30,7 +30,7 @@
 			 (cffi:null-pointer)))
 	(-consumed t))
     (let ((res
-	    (py:ensure-null-as-nil
+	    (clpy.util:ensure-null-as-nil
 		(cond
 		  ((stringp encoding)
 		   (clpy.ffi.fns:py-unicode-decode str (length str) encoding -errors))
@@ -63,10 +63,12 @@
       (when byte-order
 	(autowrap:free -byte-order))
       (values res -consumed))))
+
+(clpy.smart:smart-hook #'stringp #'new)
     
 (defun encode (unicode &optional (encoding :fs-default) &key errors mapping code-page)
   (let ((-errors (if errors errors (cffi:null-pointer))))
-    (py:ensure-null-as-nil
+    (clpy.util:ensure-null-as-nil
 	(cond
 	  ((stringp encoding)
 	   (clpy.ffi.fns:py-unicode-as-encoded-string unicode encoding -errors))
@@ -102,27 +104,27 @@
 ;; operations
 
 (defun concat (left right)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-unicode-concat left right)
     (error 'py.exc:generic-error)))
 
 (defun split (unicode sep &optional maxsplit)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-unicode-split unicode sep (or maxsplit -1))
     (error 'py.exc:generic-error)))
 
 (defun split-lines (unicode &optional (keep-ends nil))
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-unicode-splitlines unicode (if keep-ends 0 1))
     (error 'py.exc:generic-error)))
 
 (defun join (sep seq)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-unicode-join sep seq)
     (error 'py.exc:generic-error)))
 
 (defun replace (unicode substr replstr &key maxcount)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-unicode-replace unicode substr replstr (or maxcount -1))
     (error 'py.exc:generic-error)))
 
@@ -173,7 +175,7 @@
 ;; properties
 
 (defun size (unicode)
-  (py:ensure-non-negative
+  (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-unicode-get-length unicode)
     (error 'py.exc:generic-error)))
 

@@ -16,6 +16,10 @@
   (py:let ((l (py.list:new-of 5)))
     (is (= 5 (py.list:size l)))))
 
+(test new-list-with-nil
+  (py:let ((l (py.list:new nil)))
+    (is (= 1 (py.list:size l)))))
+
 (test new-list-with-number
   (py:let ((l (py.list:new 1 2 3 4 5 6)))
     (is (= 6 (py.list:size l)))))

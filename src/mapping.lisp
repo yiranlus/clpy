@@ -31,7 +31,7 @@
 
 (defun set-item (o key value)
   (py:ensure-zero
-      (py:let ((-value (py:new value)))
+      (py:let ((-value (clpy.smart:new value)))
 	(if (stringp key)
 	    (clpy.ffi.fns:py-mapping-set-item-string o key -value)
 	    (py.obj:set-item o key -value)))
@@ -39,7 +39,7 @@
 
 (defun del-item (o key)
   (py:ensure-zero
-      (py:let ((-key (py:new key)))
+      (py:let ((-key (clpy.smart:new key)))
 	  (py.obj:del-item o -key))
     (error 'py.exc:generic-error)))
 
@@ -47,7 +47,7 @@
   (plusp
    (if (stringp key)
        (clpy.ffi.fns:py-mapping-has-key-string o key)
-       (py:let ((-key (py:new key)))
+       (py:let ((-key (clpy.smart:new key)))
 	 (clpy.ffi.fns:py-mapping-has-key o -key)))))
 
 (defun keys (o)

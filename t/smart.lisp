@@ -6,9 +6,19 @@
 
 (in-suite smart-test)
 
+(test new-nil-object
+  (py:let ((x (py:new nil)))
+    (is-true (null x))))
+
+(test new-empty-string
+  (py:let ((x (py:new "")))
+    (is (py.str:p x))))
+
 (test new-string-singlton
   (py:let ((x (py:new "lsjdflksjf")))
-    (is (py.str:p x))))
+    (is-true (py.str:p x))
+    (py:let ((v (py.str:encode x)))
+      (is (string-equal "lsjdflksjf" (py.bytes:as-string v))))))
 
 (test new-number-singlton
   (py:let ((x (py:new 20)))
@@ -57,3 +67,4 @@
     (py:let ((y (py.list:get-item x 4)))
       (is-true (py.dict:p y)))
     (is (= 5 (py.list:size x)))))
+

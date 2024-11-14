@@ -1,8 +1,9 @@
 (defpackage :clpy.tuple
   (:nicknames :py.tuple)
   (:use :cl)
-  (:export #:new
-           #:pack
+  (:export #:new-of
+           #:new
+           #:p
            #:size
            #:get-item
            #:get-slice
@@ -10,32 +11,40 @@
 
 (in-package :clpy.tuple)
 
-(declaim (ftype (function (integer)) new))
-(defun new (len)
-  (py:ensure-null-as-nil (clpy.ffi.fns:py-tuple-new len)))
+(clpy.type:define-type "PyTuple_Type" tuple)
 
-(defmacro pack (&rest args)
-  "Return a new tuple object contained in ARGS. Every element of ARGS should
-be a py-object."
-  `(py:ensure-null-as-nil
-     (clpy.ffi.fns:py-tuple-pack
-      ,(length args)
-      ,@(loop for i in args
-              collect :pointer
-              collect (autowrap:ptr i)))))
+(defun p (o)
+  (clpy.type:of o :tuple))
+
+(defun new-of (n)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-tuple-new n)
+    (error 'py.exc:generic-error)))
+
+(defun new (&rest items)
+  (let ((l (new-of (length items))))
+    (loop for i in items
+	  for index from 0
+	  do (let ((py-i (clpy.smart:new i)))
+	       (set-item l index py-i)))
+    l))
+
+(clpy.smart:smart-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
+                       #'(lambda (x) (apply #'new (cdr x))))
 
 (defun size (o)
-  (clpy.ffi.fns:py-tuple-size py-tuple))
+  (clpy.ffi.fns:py-tuple-size o))
 
-(defun get-item (p pos)
-  (py:ensure-null-as-nil
-    (clpy.ffi.fns:py-tuple-get-item p pos)))
+(defun get-item (o index)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-tuple-get-item o index)
+    (error 'py.exc:generic-error)))
 
-(defun get-slice (p low high &key (as-tuple nil))
-  (py:ensure-null-as-nil
-    (clpy.ffi.fns:py-tuple-get-item p pos)))
+(defun set-item (o index value)
+  (clpy.util:ensure-zero
+      (let ((-value (clpy.smart:new value)))
+	(clpy.ffi.fns:py-tuple-set-item o index -value))
+    (error 'py.exc:generic-error)))
 
-(defun set-item (p pos o)
-  "Return the object at position POS in the tuple pointed to by P."
-  (zerop
-   (clpy.ffi.fns:py-tuple-set-item p pos o)))
+(defun get-slice (o low high)
+  (clpy.ffi.fns:py-tuple-get-slice o low high))

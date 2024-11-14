@@ -11,7 +11,7 @@
 
 (defun get-attr (o attr-name)
   "Retrieve an attribute named ATTR-NAME. ATTR-NAME can be a py-object or a string"
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (if (stringp attr-name)
           (clpy.ffi.fns:py-object-get-attr-string o attr-name)
           (clpy.ffi.fns:py-object-get-attr o attr-name))
@@ -19,7 +19,7 @@
 
 (defun set-attr (o attr-name v)
   "Set the value of the attribute named ATTR-NAME, for object o,to the value v."
-  (py:ensure-zero
+  (clpy.util:ensure-zero
       (if (stringp attr-name)
           (clpy.ffi.fns:py-object-set-attr-string o attr-name v)
           (clpy.ffi.fns:py-object-set-attr o attr-name v))

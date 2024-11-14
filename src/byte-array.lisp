@@ -1,9 +1,8 @@
 (defpackage :clpy.byte-array
   (:nicknames :py.byte-array)
   (:use :cl)
-  (:export #:+type+
-           #:from-object
-           #:from-string
+  (:export #:p
+           #:new
            #:concat
            #:size
            #:as-string
@@ -11,26 +10,29 @@
 
 (in-package :clpy.byte-array)
 
-(cffi:defcvar "PyByteArray_Type" :int)
-(defconstant +type+ (cffi:get-var-pointer '*pybytearray-type*))
+(clpy.type:define-type "PyByteArray_Type" byte-array)
 
-(defun from-object (o)
+(defun p (o)
+  (clpy.type:of o :byte-array))
+
+(defun new (v)
+  "Create a new bytearray object from V. V can be either a string or a PyObject which support buffer protocol."
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-byte-array-from-object o)))
+      (if (stringp v)
+          (clpy.ffi.fns:py-byte-array-from-string-and-size v (length v))
+          (clpy.ffi.fns:py-byte-array-from-object v))
+    (error 'py.exc:generic-error)))
 
-(defun from-string (str)
+(defun concat (o1 o2)
   (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-byte-array-from-string-and-size str (length str))))
+      (clpy.ffi.fns:py-byte-array-concat o1 o2)
+    (error 'py.exc:generic-error)))
 
-(defun concat (a b)
-  (py:ensure-null-as-nil
-      (clpy.ffi.fns:py-byte-array-concat a b)))
+(defun size (o)
+  (clpy.ffi.fns:py-byte-array-size o))
 
-(defun size (byte-array)
-  (clpy.ffi.fns:py-byte-array-size byte-array))
+(defun as-string (o)
+  (clpy.ffi.fns:py-byte-array-as-string o))
 
-(defun as-string (byte-array)
-  (clpy.ffi.fns:py-byte-array-as-string byte-array))
-
-(defun resize (byte-array len)
-  (clpy.ffi.fns:py-byte-array-resize byte-array len))
+(defun resize (o length)
+  (clpy.ffi.fns:py-byte-array-resize o length))

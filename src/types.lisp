@@ -18,7 +18,7 @@
   (cl:cdr (cl:assoc kw *assoc-types*)))
 
 (cl:defun of (o type)
-  (cffi:pointer-eq (plus-c:c-ref o clpy.ffi:py-object :ob-type) (get type)))
+  (cffi:pointer-eq (clpy.ffi.acc:py-object.ob-type o) (get type)))
 
 (cl:defmacro define-type (cname name)
   (cl:let* ((name-str (cl:symbol-name name))
@@ -39,24 +39,7 @@
 
 ;; Basic types
 
-
-
 ;;(defcvar "PyEnum_Type" enum)
-
-;; Dict
-;;(defcvar "PyDict_Type" dict)
-
-;;(defcvar "PyDictItems_Type" dict-items)
-;;(defcvar "PyDictIterItem_Type" dict-iter-item)
-;;(defcvar "PyDictIterKey_Type" dict-iter-key)
-;;(defcvar "PyDictIterValue_Type" dict-iter-value)
-;;(defcvar "PyDictKeys_Type" dict-keys)
-
-;;(defcvar "PyDictProxy_Type" dict-proxy)
-;;(defcvar "PyDictRevIterItem_Type" dict-rev-iter-item)
-;;(defcvar "PyDictRevIterKey_Type" dict-rev-iter-key)
-;;(defcvar "PyDictRevIterValue_Type" dict-rev-iter-value)
-;;(defcvar "PyDictValues_Type" dict-values)
 
 ;;(defcvar "PyCapsule_Type" capsule)
 

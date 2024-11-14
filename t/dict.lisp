@@ -19,6 +19,10 @@
     (py:let ((v (py.str:encode (py.dict:get-item dict "key 1"))))
       (is (string-equal "value 1" (py.bytes:as-string v))))))
 
+;; (test new-dict-with-nil
+;;   (py:let ((dict (py.dict:new nil)))
+;;     (is (= 0 (py.dict:size dict)))))
+
 (test clear-dict
   (py:let ((dict (py.dict:new
 		  (cons "key 1" "value 1")
