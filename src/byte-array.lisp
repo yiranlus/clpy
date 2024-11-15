@@ -11,6 +11,7 @@
 (in-package :clpy.byte-array)
 
 (clpy.type:define-type "PyByteArray_Type" byte-array)
+(clpy.type:define-type "PyByteArrayIter_Type" byte-array-iter)
 
 (defun p (o)
   (clpy.type:of o :byte-array))

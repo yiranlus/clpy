@@ -53,11 +53,15 @@
                              (:file "sequence" :depends-on ("types" "utils" "pylet"))
                              (:file "mapping" :depends-on ("types" "utils" "pylet" "object"))
                              (:file "buffer" :depends-on ("ffi"))
+                             (:file "slice" :depends-on ("ffi" "utils" "types" "error"))
+                             (:file "iter" :depends-on ("ffi" "utils" "error"))
+                             (:file "codec" :depends-on ("ffi" "utils" "error"))
 
                              (:file "memory" :depends-on ("ffi" "object"))
 
                              (:file "module" :depends-on ("ffi" "types" "utils" "error"))
                              (:file "import" :depends-on ("ffi" "smart" "utils" "unicode" "dict" "list"))
+                             (:file "capsule" :depends-on ("ffi" "utils" "error"))
 
                              (:file "smart" :depends-on ("object"))
                              

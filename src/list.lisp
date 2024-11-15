@@ -1,4 +1,4 @@
-(cl:defpackage :clpy.list
+(defpackage :clpy.list
   (:nicknames :py.list)
   (:use :cl)
   (:shadow #:append #:sort #:reverse)
@@ -16,7 +16,7 @@
 	   #:reverse
 	   #:as-tuple))
 
-(cl:in-package :clpy.list)
+(in-package :clpy.list)
 
 (clpy.type:define-type "PyList_Type" list)
 (clpy.type:define-type "PyListIter_Type" list-iter)

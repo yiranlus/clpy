@@ -31,23 +31,20 @@
 
 (define-type "PyBaseObject_Type" base)
 
-;;(defcvar "PyBytes_Type" bytes)
-;;(defcvar "PyByteArray_Type" byte-array)
-;;(defcvar "PyByteArrayIter_Type" byte-array-iter)
-
 ;;(defcvar "PyFrozenSet_Type" frozen-set)
-
-;; Basic types
-
-;;(defcvar "PyEnum_Type" enum)
-
-;;(defcvar "PyCapsule_Type" capsule)
 
 ;;(defcvar "CFunction_Type" c-function)
 ;;(defcvar "CallIter_Type" call-iter)
 ;;(defcvar "PyClassMethodDescr_Type" class-method-descr)
 
-;;(defcvar "PyFilter_Type" filter)
+;; other types
+(define-type "PyEnum_Type" enum)
 
-;; Misc
-;;(defcvar "PyEllipsis_Type" ellipsis)
+(define-type "PyFilter_Type" filter)
+(define-type "PyMap_type" map)
+
+(define-type "PyEllipsis_Type" ellipsis)
+(define-type "PyRange_Type" range)
+(define-type "PyRangeIter_Type" range-iter)
+(define-type "PyReversed_Type" reversed)
+

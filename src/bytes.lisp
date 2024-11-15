@@ -9,6 +9,7 @@
 (cl:in-package :clpy.bytes)
 
 (clpy.type:define-type "PyBytes_Type" bytes)
+(clpy.type:define-type "PyBytesIter_Type" bytes-iter)
 
 (defun new (v)
   (clpy.util:ensure-null-as-nil
