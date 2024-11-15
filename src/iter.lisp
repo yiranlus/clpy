@@ -19,7 +19,7 @@
 (defun next (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-iter-next o)
-    (when (py:error-occurred)
+    (when (clpy.core:error-occurred)
       (error 'py.exc:python-error))))
 
 (defun send (o arg)
