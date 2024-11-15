@@ -49,3 +49,9 @@
 ;;  (py:ensure-zero
 ;;      (clpy.ffi.fns:py-object-generic-set-dict o value context)
 ;;    (error 'py.exc:attribute-error)))
+
+(defun dir (&optional (o nil))
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-object-dir o)
+    (when (clpy.core:error-occurred)
+      (error 'py.exc:generic-error))))

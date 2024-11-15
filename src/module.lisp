@@ -4,6 +4,7 @@
   (:use :cl)
   (:export #:p
            #:new
+           ;; get properties
            #:get-dict
            #:get-name
            #:get-state

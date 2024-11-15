@@ -20,6 +20,9 @@
            ;;#:generic-set-attr
            ;;#:generic-get-dict
            ;;#:generic-set-dict
+           #:dir
+
+           ;; query
            ;;#:rich-compare
            ;;#:format
            #:repr
@@ -33,11 +36,12 @@
            #:is-true
            #:is-false
            ;;#:type
-           ;;#:size
+
+           ;; item
+           #:size
            #:get-item
            #:set-item
            #:del-item
-           ;;#:dir
            ;;#:get-iter
            ;;#:get-a-iter
            ;; callable
