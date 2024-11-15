@@ -10,11 +10,11 @@
               (null kwargs))
          (clpy.ffi.fns:py-object-call-no-args callable))
         ((null kwargs)
-         (clpy.pylet:let* ((-args (py:new `(:list ,@args)))
+         (clpy.pylet:let* ((-args (py:new `(:l ,@args)))
                            (-args-tuple (py.list:as-tuple -args)))
            (clpy.ffi.fns:py-object-call-object callable -args-tuple)))
         (t (clpy.pylet:let* ((-args (apply #'py.list args))
                              (-args-tuple (py.list:as-tuple -args))
-                             (-kwargs (if kwargs (py:new `(:dict ,@kwargs)))))
+                             (-kwargs (if kwargs (py:new `(:d ,@kwargs)))))
              (clpy.ffi.fns:py-object-call -args-tuple -kwargs))))))
                             

@@ -41,7 +41,7 @@
 (define-type "PyEnum_Type" enum)
 
 (define-type "PyFilter_Type" filter)
-(define-type "PyMap_type" map)
+(define-type "PyMap_Type" map)
 
 (define-type "PyEllipsis_Type" ellipsis)
 (define-type "PyRange_Type" range)

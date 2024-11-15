@@ -16,9 +16,9 @@
                            (-cpathname (clpy.smart:new cpathname)))
             (clpy.ffi.fns:py-import-exec-code-module-object -name pycode -pathname -cpathname))
           (clpy.pylet:let ((-name (clpy.smart:new name))
-                           (-globals (if globals (clpy.smart:new `(:dict ,globals))))
+                           (-globals (if globals (clpy.smart:new `(:d ,globals))))
                            (-locals nil) ;; not used
-                           (-from-list (if from-list (clpy.smart:new `(:list from-list)))))
+                           (-from-list (if from-list (clpy.smart:new `(:l from-list)))))
             (clpy.ffi.fns:py-import-import-module-level-object -name -globals -locals -from-list level)))
     (error 'py.exc:generic-error)))
 

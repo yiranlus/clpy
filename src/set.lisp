@@ -15,7 +15,7 @@
 
 (clpy.type:define-type "PySet_Type" set)
 
-(clpy.smart:smart-hook #'(lambda (x) (and (listp x) (eq :set (car x))))
+(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :s (car x))))
                        #'(lambda (x) (apply #'new (cdr x))))
 
 (defun new (&rest items)

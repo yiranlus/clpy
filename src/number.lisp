@@ -73,8 +73,6 @@
 	   (otherwise (new-long n :method type)))))
     (error 'py.exc:generic-error :message (format nil "Unable to create PyObject for ~A." n))))
 
-(clpy.smart:smart-hook #'numberp #'new)
-
 (defun p (o)
   (plusp (clpy.ffi.fns:py-number-check o)))
 
@@ -107,6 +105,17 @@
 	 (clpy.ffi.fns:py-long-as-unsigned-long-long-mask o)
 	 (clpy.ffi.fns:py-long-as-unsigned-long-long o)))
     (:size-t (clpy.ffi.fns:py-long-as-size-t o))))
+
+;; smart
+
+(clpy.smart:new-hook #'numberp #'new)
+;; (clpy.smart:print-hook :long (lambda (x) (princ-to-string (as-integer x)))
+;; (clpy.smart:print-hook :float (lambda (x) (princ-to-string x)))
+;; (clpy.smart:print-hook :complex
+;;                        (lambda (x)
+;;                          (py:let ((r (real x))
+;;                                   (i (imag x)))
+;;                            (format nil "#(~A ~A)" r i))))
 
 ;; conversion
 

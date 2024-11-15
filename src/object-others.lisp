@@ -58,20 +58,6 @@
 
 ;; Evaluation
 
-(defun is-true (o)
-  "Return T if the object o is considered to be true, otherwise NIL"
-  (not (zerop
-        (clpy.util:ensure-non-negative
-            (clpy.ffi.fns:py-object-is-true o)
-          (error 'py.exc:python-error)))))
-
-(defun is-false (o)
-  "Return NIL if the object o is considered to be true, otherwise t"
-  (not (zerop
-        (clpy.util:ensure-non-negative
-            (clpy.ffi.fns:py-object-not o)
-          (error 'py.exc:python-error)))))
-
 ;;(defun type (o)
 ;;  "When O is no-NULL, returns a type object corresponding to the object type of object O"
 ;;  (py:ensure-null-as-nil

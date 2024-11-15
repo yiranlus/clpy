@@ -2,7 +2,7 @@
   (:nicknames :py.obj)
   (:use :cl)
   (:shadow #:format #:type)
-  (:export #:object-p
+  (:export #:p
 	   #:ob-refcnt
 	   #:ob-type
 	   #:new-ref

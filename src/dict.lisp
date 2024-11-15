@@ -22,7 +22,7 @@
 
 (clpy.type:define-type "PyDict_Type" dict)
 (clpy.type:define-type "PyDictKeys_Type" dict-keys)
-(clpy.type:define-type "PyDictvalues_Type" dict-values)
+(clpy.type:define-type "PyDictValues_Type" dict-values)
 (clpy.type:define-type "PyDictItems_Type" dict-items)
 (clpy.type:define-type "PyDictIterKey_Type" dict-iter-key)
 (clpy.type:define-type "PyDictIterValue_Type" dict-iter-value)
@@ -46,8 +46,8 @@
 		 (set-item d -k -v))))
     d))
 
-(clpy.smart:smart-hook #'(lambda (x) (and (listp x) (eq :dict (car x))))
-                       #'(lambda (x) (apply #'new (cdr x))))
+(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :d (car x))))
+                     #'(lambda (x) (apply #'new (cdr x))))
 
 (defun p (o)
   (clpy.type:of o :dict))

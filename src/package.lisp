@@ -4,6 +4,7 @@
         :clpy.object :clpy.pylet
         :clpy.util :clpy.smart)
   (:export #:new
+           #:print
 
 	   ;; PyObject
 	   #:object-p

@@ -64,7 +64,7 @@
 	(autowrap:free -byte-order))
       (values res -consumed))))
 
-(clpy.smart:smart-hook #'stringp #'new)
+(clpy.smart:new-hook #'stringp #'new)
     
 (defun encode (unicode &optional (encoding :fs-default) &key errors mapping code-page)
   (let ((-errors (if errors errors (cffi:null-pointer))))

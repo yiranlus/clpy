@@ -1,9 +1,9 @@
 (in-package :clpy.object)
 
-(defun object-p (obj)
+(defun p (obj)
   (typep obj 'clpy.ffi:py-object))
 
-(clpy.smart:smart-hook #'object-p
+(clpy.smart:new-hook #'p
                        (lambda (x)
                          (inc-xref x)
                          x))

@@ -29,7 +29,7 @@
 	       (set-item l index py-i)))
     l))
 
-(clpy.smart:smart-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
+(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
                        #'(lambda (x) (apply #'new (cdr x))))
 
 (defun size (o)
