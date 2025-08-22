@@ -20,3 +20,4 @@
 .\#*.lisp
 \#*.lisp#
 __pycache__
+.qlot/
