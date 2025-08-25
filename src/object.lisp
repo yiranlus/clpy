@@ -1,7 +1,7 @@
 (defpackage :clpy.object
   (:nicknames :py.obj)
   (:use :cl)
-  (:shadow #:format #:type)
+  (:shadow #:format #:type #:not)
   (:export #:p
 	   #:ob-refcnt
 	   #:ob-type
@@ -11,6 +11,9 @@
 	   #:inc-xref
            #:dec-ref
 	   #:dec-xref
+
+	   ;; constant
+	   #:not-implemented
 
 	   ;; attr
 	   #:has-attr
@@ -33,8 +36,10 @@
            #:is-instance
            ;;#:hash
            ;;#:hash-not-implemented
-           #:is-true
-           #:is-false
+           #:true-p
+	   #:false-p
+	   #:none-p
+           #:not
            ;;#:type
 
            ;; item
@@ -44,6 +49,8 @@
            #:del-item
            ;;#:get-iter
            ;;#:get-a-iter
-           ;; callable
+
+	   ;; function calling
+           #:callable-p
            #:call
            ))

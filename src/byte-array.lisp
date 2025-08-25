@@ -2,6 +2,7 @@
   (:nicknames :py.byte-array)
   (:use :cl)
   (:export #:p
+	   #:exact-p
            #:new
            #:concat
            #:size
@@ -14,20 +15,30 @@
 (clpy.type:define-type "PyByteArrayIter_Type" byte-array-iter)
 
 (defun p (o)
+  (or (clpy.type:of o :byte-array)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :byte-array))))
+
+(defun exact-p (o)
   (clpy.type:of o :byte-array))
 
 (defun new (v)
-  "Create a new bytearray object from V. V can be either a string or a PyObject which support buffer protocol."
-  (py:ensure-null-as-nil
+  "Create a new bytearray object from ``V``.
+
+``V`` can be either a string or a PyObject which support buffer protocol."
+  (clpy.util:ensure-null-as-nil
       (if (stringp v)
           (clpy.ffi.fns:py-byte-array-from-string-and-size v (length v))
           (clpy.ffi.fns:py-byte-array-from-object v))
-    (error 'py.exc:generic-error)))
+    (error 'clpy.exception:generic-error)))
+
+(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :byte-array (car x))))
+		     #'(lambda (x) (apply #'new (cdr x))))
 
 (defun concat (o1 o2)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-byte-array-concat o1 o2)
-    (error 'py.exc:generic-error)))
+    (error 'clpy.exception:generic-error)))
 
 (defun size (o)
   (clpy.ffi.fns:py-byte-array-size o))

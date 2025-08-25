@@ -6,7 +6,7 @@
 
 (in-package :clpy.ffi)
 
-(autowrap:c-include '(clpy clpy-inc "Python.h")
+(autowrap:c-include '(clpy clpy-inc "stable-api.h")
            :spec-path '(clpy clpy-spec)
            :accessor-package :clpy.ffi.acc
            :function-package :clpy.ffi.fns

@@ -12,8 +12,14 @@
 (in-package :clpy.tuple)
 
 (clpy.type:define-type "PyTuple_Type" tuple)
+(clpy.type:define-type "PyTupleIter_Type" tuple-iter)
 
 (defun p (o)
+  (or (clpy.type:of o :tuple)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :tuple))))
+
+(defun exact-p (o)
   (clpy.type:of o :tuple))
 
 (defun new-of (n)
@@ -30,7 +36,7 @@
     l))
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
-                       #'(lambda (x) (apply #'new (cdr x))))
+		     #'(lambda (x) (apply #'new (cdr x))))
 
 (defun size (o)
   (clpy.ffi.fns:py-tuple-size o))

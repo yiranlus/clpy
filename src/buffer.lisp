@@ -26,12 +26,10 @@
 ;; Py_buffer
 
 (defun buffer-buf (buf)
-  (py:ensure-null-as-nil
-      (clpy.ffi.acc:py-buffer.buf buf)))
+  (clpy.ffi.acc:py-buffer.buf buf))
 
 (defun buffer-obj (buf)
-  (py:ensure-null-as-nil
-      (clpy.ffi.acc:py-buffer.obj buf)))
+  (clpy.ffi.acc:py-buffer.obj buf))
 
 (defun buffer-len (buf)
   (clpy.ffi.acc:py-buffer.len buf))
@@ -108,9 +106,9 @@
 
 (defun get-buffer (o &rest flags)
   (c-let ((view clpy.ffi:py-buffer))
-    (py:ensure-non-negative
+    (clpy.util:ensure-zero
         (clpy.ffi.fns:py-object-get-buffer o view (apply #'make-flags flags))
-      (error 'py.exc:generic-error))
+      (clpy.exception:raise-generic-or-python-error))
     view))
 
 (defun release (view)
@@ -118,9 +116,9 @@
   (autowrap:free view))
 
 (defun size-from-format (format)
-  (py:ensure-non-negative
+  (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-buffer-size-from-format format)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun contiguous-p (view order)
   (plusp
@@ -140,9 +138,9 @@
       (dotimes (i len)
         (setf (-indices i) (nth i indices)))
       (setf res (clpy.ffi.fns:py-buffer-get-pointer view -indices)))
-    (py:ensure-null-as-nil
+    (clpy.util:ensure-null-as-nil
         res
-      (error 'py.exc:generic-error))))
+      (clpy.exception:raise-generic-or-python-error))))
 
 (defun copy (from to as-order &optional len)
   (let ((order (case as-order
@@ -150,7 +148,7 @@
                  (:f (char-code #\F))
                  (:any (char-code #\A))
                  (otherwise (error (format nil "Non-supported ORDER ~A" as-order))))))
-    (py:ensure-non-negative
+    (clpy.util:ensure-non-negative
         (cond
           ((and (typep from 'clpy.ffi:py-buffer)
                 (cffi:pointerp to))
@@ -159,16 +157,18 @@
           ((and (cffi:pointerp from)
                 (typep to 'clpy.ffi:py-buffer))
            (unless len
-             (error "LENGTH must be specified when copying from pointer."))
+             (error 'clpy.exception:generic-error
+		    :message "LENGTH must be specified when copying from pointer."))
            (when (eq as-order :any)
              (error ":ANY is not supported when copying from pointer"))
            (clpy.ffi.fns:py-buffer-from-contiguous to from len order))
           ((and (typep from 'clpy.ffi:py-object)
                 (typep to 'clpy.ffi:py-object))
            (clpy.ffi.fns:py-object-copy-data to from))
-          (t (error (format nil "Copying data from TYPE ~A to ~A is not supported"
-                            (type-of from) (type-of to)))))
-      (error 'py.exc:generic-error))))
+          (t (error 'clpy.exception:generic-error
+		    :message (format nil "Copying data from TYPE ~A to ~A is not supported"
+				     (type-of from) (type-of to)))))
+      (clpy.exception:raise-generic-or-python-error))))
 
 
 

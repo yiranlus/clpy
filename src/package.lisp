@@ -1,10 +1,10 @@
 (defpackage :clpy
   (:nicknames :py)
-  (:use :clpy.core :clpy.import
-        :clpy.object :clpy.pylet
-        :clpy.util :clpy.smart)
+  (:use :clpy.interpreter :clpy.object :clpy.import
+        :clpy.util :clpy.smart 
+	:clpy.exception :clpy.eval)
   (:export #:new
-           #:print
+           ;; #:print
 
 	   ;; PyObject
 	   #:object-p
@@ -17,12 +17,11 @@
            #:dec-ref
 	   #:dec-xref
 
-	   ;; initialization and finalization
+	   ;; interpreter
            #:initialize
            #:is-initialized
            #:finalize
 	   
-           ;; runtime.lisp
            #:encode-locale
            #:decode-locale
            #:set-program-name
@@ -36,19 +35,19 @@
            #:get-copyright
            #:get-compiler
            #:get-build-info
-           #:set-python-home
-           #:get-python-home
+	   #:get-recursion-limit
+
+	   ;; clpy.eval
+	   #:eval
+
+	   ;; clpy.import
+           #:import
 	   
-           #:import ;; import.lisp
-           #:clear-error ;; error.lisp
+	   ;; clpy.exception
+           #:clear-error
            #:print-error
            #:error-occurred
 
 	   ;; clpy.util
-	   #:ensure-null-as-nil
-	   #:ensure-zero
-	   #:ensure-non-negative
-
-	   ;; clpy.pylet
 	   #:let #:let*
            ))

@@ -4,7 +4,8 @@
   (:shadow #:values #:merge)
   (:export #:new
 	   #:p
-	   #:new-proxy
+	   #:exact-p
+	   #:proxy-new
 	   #:clear
 	   #:contains
 	   #:copy
@@ -33,6 +34,14 @@
 
 (clpy.type:define-type "PyDictProxy_Type" dict-proxy)
 
+(defun p (o)
+  (or (clpy.type:of o :dict)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :dict))))
+
+(defun exact-p (o)
+  (clpy.type:of o :dict))
+
 (defun new (&rest mapping)
   (let ((d (clpy.util:ensure-null-as-nil
 		  (clpy.ffi.fns:py-dict-new)
@@ -41,83 +50,82 @@
                (not (and (= 1 (length mapping))
                          (null (car mapping)))))
       (loop for (k . v) in mapping
-	    do (clpy.pylet:let ((-k (clpy.smart:new k))
+	    do (clpy.util:let ((-k (clpy.smart:new k))
 			(-v  (clpy.smart:new v)))
 		 (set-item d -k -v))))
     d))
 
-(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :d (car x))))
+(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :dict (car x))))
                      #'(lambda (x) (apply #'new (cdr x))))
 
-(defun p (o)
-  (clpy.type:of o :dict))
 
-(defun new-proxy (o)
+(defun proxy-new (mapping)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-proxy-new o)
+      (clpy.ffi.fns:py-dict-proxy-new mapping)
     (error 'py.exc:generic-error)))
 
 (defun clear (o)
   (clpy.ffi.fns:py-dict-clear o))
 
 (defun contains (o key)
-  (case (clpy.pylet:let ((-key (clpy.smart:new key)))
+  (case (clpy.util:let ((-key (clpy.smart:new key)))
 	  (clpy.ffi.fns:py-dict-contains o -key))
     (1 t)
     (0 nil)
-    (-1 (error 'py.exc:generic-error))))
+    (-1 (clpy.exception:raise-generic-or-python-error))))
 
 (defun copy (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-copy o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun set-item (o key value)
   (clpy.util:ensure-non-negative
       (if (stringp key)
-	  (clpy.pylet:let ((-value (clpy.smart:new value)))
+	  (clpy.util:let ((-value (clpy.smart:new value)))
 	    (clpy.ffi.fns:py-dict-set-item-string o key -value))
-	  (clpy.pylet:let ((-key (clpy.smart:new key))
+	  (clpy.util:let ((-key (clpy.smart:new key))
 		   (-value (clpy.smart:new value)))
 	    (clpy.ffi.fns:py-dict-set-item o -key -value)))
-    (error 'py.exc:generic-error
-	   :message (format nil "Unable to set item with key ~A to ~A."
-			    key value))))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun del-item (o key)
   (clpy.util:ensure-non-negative
       (if (stringp key)
 	  (clpy.ffi.fns:py-dict-del-item-string o key)
-	  (clpy.pylet:let ((-key (clpy.smart:new key)))
+	  (clpy.util:let ((-key (clpy.smart:new key)))
 	    (clpy.ffi.fns:py-dict-del-item o -key)))
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
-(defun get-item (o key &optional new-ref)
+(defun get-item (o key &optional suppress-error)
   (clpy.util:ensure-null-as-nil
-      (if (stringp key)
-	  (clpy.ffi.fns:py-dict-get-item-string o key)
-	  (clpy.ffi.fns:py-dict-get-item o key))
-    (error 'py.exc:generic-error)))
+      (if suppress-error
+	  (if (stringp key)
+	      (clpy.ffi.fns:py-dict-get-item-string o key)
+	      (clpy.ffi.fns:py-dict-get-item o key))
+	  (clpy.util:let ((o (clpy.smart:new key)))
+	    (clpy.ffi.fns:py-dict-get-item-with-error o key)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun items (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-items o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun keys (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-keys o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun values (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-values o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun size (o)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-dict-size o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun merge (dict-a dict-or-seq &key override)
   (clpy.util:ensure-zero
@@ -130,10 +138,11 @@
 	  (t (error 'py.exc:generic-error
 		    :message (format nil "Unsupported tyep ~A to merge in dict."
 				     (type-of dict-or-seq))))))
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun update (o dict &key override)
   (clpy.util:ensure-zero
       (clpy.ffi.fns:py-dict-update o dict)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
+
 

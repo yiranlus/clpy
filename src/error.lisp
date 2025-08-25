@@ -1,24 +1,44 @@
-(cl:in-package :clpy.core)
+(in-package :clpy.error)
 
-(defun error-occurred ()
-  "Test whether the error indicator is set. If set, return the exception TYPE. You not own a reference to the return value, so you do not need to PY:DEC-REF it."
-  (py.exc:from (clpy.util:ensure-null-as-nil
-		   (clpy.ffi.fns:py-err-occurred))))
+(defun fetch ()
+  "Retrieve the error indicator.
 
-(defun clear-error ()
-  "Clear the error indicator. If the error indicator is not set, there is no effect."
-  (clpy.ffi.fns:py-err-clear))
+The retrieved objects will be automatically normalized."
+  (c-with ((ptype (:pointer clpy.ffi:py-object))
+	   (pvalue (:pointer clpy.ffi:py-object))
+	   (ptrackback (:pointer clpy.ffi:py-object)))
+    (clpy.ffi.fns:py-err-fetch (ptype &) (pvalue &) (ptrackback &))
+    (clpy.ffi.fns:py-err-normalize-exception (ptype &) (pvalue &) (ptrackback &))
+    (values (clpy.util:ensure-null-as-nil (ptype *))
+	    (clpy.util:ensure-null-as-nil (pvalue *))
+	    (clpy.util:ensure-null-as-nil (ptrackback *)))))
 
-(defun print-error (&optional (set-sys-last-vars 1))
-  "Print a standard tracebak to ``sys.stderr'' and clear the error indicator."
-  (clpy.ffi.fns:py-err-print-ex set-sys-last-vars))
+(defun restore (type value trackback)
+  (clpy.ffi.fns:py-err-restore type value trackback))
 
-(cl:defpackage :clpy.error
-  (:nicknames :py.error)
-  (:use :cl)
-  (:export))
+(defun fetch-as-string ()
+  "Return the string of type, value and trackback of current exception.
 
-(cl:in-package :clpy.error)
+This function combine the :cl:function:`fetch` and :cl:function:`restore`
+to get the string representation of the current exception."
+  (multiple-value-bind (type value traceback) (fetch)
+    (when type
+      (let ((type-str (clpy.util:let* ((obj-str (clpy.object:str type))
+				       (encoded (clpy.str:encode obj-str)))
+			(clpy.bytes:as-string encoded)))
+	    
+	    (value-str (when value
+			 (clpy.util:let* ((obj-str (clpy.object:str value))
+					  (encoded (clpy.str:encode obj-str)))
+			   (clpy.bytes:as-string encoded))))
+	    (traceback-str (when traceback
+			     (clpy.util:let* ((obj-str (clpy.object:str traceback))
+					      (encoded (clpy.str:encode obj-str)))
+			       (clpy.bytes:as-string encoded)))))
+	(restore type value traceback)
+	(values type-str value-str traceback-str)))))
+
+;;(cl:in-package :clpy.error)
 
 ;;(defun write-unraisable (obj)
 ;;  "Call ``sys.unraisablehook()'' using the current exception and OBJ argument."

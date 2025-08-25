@@ -6,7 +6,7 @@ use IO::Handle;
 # Create a temporary file
 my ($fh, $filename) = tempfile(SUFFIX => '.h', UNLINK => 1);
 print $fh <<EOF;
-#define Py_LIMITED_API 0x030C0000
+#define Py_LIMITED_API 0x030B0000
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 EOF

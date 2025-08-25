@@ -5,23 +5,66 @@
 	   #:int #:float #:and #:or #:xor)
   (:export #:new
 	   #:p
+	   #:int-p
+	   #:int-exact-p
+	   #:float-p
+	   #:float-exact-p
+	   #:complex-p
+	   #:complex-exact-p
 	   #:as-double
 	   #:as-integer
 	   #:int
-	   #:float
 	   #:real
 	   #:imag
 	   #:abs
-	   #:+ #:- #:* #:@ #:/ #:// #:** #:% #:~ #:divmod
+	   #:+ #:- #:* #:@ #:/ #:// #:** #:**% #:% #:~ #:divmod
 	   #:and #:or #:xor #:<< #:>>
-	   #:+= #:-= #:*= #:@= #:/= #://= #:**= #:%= #:~=
-	   #:and= #:or= #:xor= #:<<= #:<<=))
+	   #:+= #:-= #:*= #:@= #:/= #://= #:**=  #:**%= #:%= #:~=
+	   #:and= #:or= #:xor= #:<<= #:>>=))
 
 (in-package :clpy.number)
 
 (clpy.type:define-type "PyLong_Type" long)
 (clpy.type:define-type "PyFloat_Type" float)
 (clpy.type:define-type "PyComplex_Type" complex)
+
+(defun int-p (o)
+  (or (clpy.type:of o :long)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :long))))
+
+(defun int-exact-p (o)
+  (clpy.type:of o :long))
+
+(defun float-p (o)
+  (or (clpy.type:of o :float)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :float))))
+
+(defun float-exact-p (o)
+  (clpy.type:of o :float))
+
+(defun complex-p (o)
+  (or (clpy.type:of o :complex)
+      (clpy.type:subtype-p (clpy.object:ob-type o)
+			    (clpy.type:get :complex))))
+
+(defun complex-exact-p (o)
+  (clpy.type:of o :complex))
+
+
+(defun p (o)
+  (plusp (clpy.ffi.fns:py-number-check o)))
+
+(defun float-info ()
+  (clpy.ffi.fns:py-float-get-info))
+
+(defun float-min ()
+  (clpy.ffi.fns:py-float-get-min))
+
+(defun float-max ()
+  (clpy.ffi.fns:py-float-get-max))
+  
 
 (defvar *py-long-from-binding-list*
   `((:long . ,#'clpy.ffi.fns:py-long-from-long)
@@ -72,9 +115,6 @@
 	   (:complex (clpy.ffi.fns:py-complex-from-doubles (realpart n) (imagpart n)))
 	   (otherwise (new-long n :method type)))))
     (error 'py.exc:generic-error :message (format nil "Unable to create PyObject for ~A." n))))
-
-(defun p (o)
-  (plusp (clpy.ffi.fns:py-number-check o)))
 
 (defun as-double (o)
   (case (py.obj:ob-type o)
@@ -129,20 +169,31 @@
       (clpy.ffi.fns:py-number-float o)
     (error 'py.exc:generic-error)))
 
+(defun index (o)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-number-index o)
+    (clpy.exception:raise-generic-or-python-error)))
+
+(defun to-base (o base)
+  "Return the integer ``o`` converted to base base as a string."
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-number-to-base o base)
+    (clpy.exception:raise-generic-or-python-error)))
+
 ;; operations
 
 (defun + (o1 &optional (o2 nil))
   (clpy.util:ensure-null-as-nil
       (if o2
 	  (clpy.ffi.fns:py-number-add o1 o2)
-	  (clpy.ffi.fns:py-number-add o1))
+	  (clpy.ffi.fns:py-number-positive o1))
     (error 'py.exc:generic-error)))
 
 (defun - (o1 &optional (o2 nil))
   (clpy.util:ensure-null-as-nil
       (if o2
 	  (clpy.ffi.fns:py-number-subtract o1 o2)
-	  (clpy.ffi.fns:py-number-subtract o1))
+	  (clpy.ffi.fns:py-number-negative o1))
     (error 'py.exc:generic-error)))
 
 (defun * (o1 o2)
@@ -177,8 +228,16 @@
 
 (defun ** (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-power o1 o2)
-    (error 'py.exc:generic-error)))
+      (let* ((none (clpy.none:new))
+	     (res (clpy.ffi.fns:py-number-power o1 o2 none)))
+	(clpy.object:dec-ref none)
+	res))
+  (error 'py.exc:generic-error))
+
+(defun **% (o1 o2 o3)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-number-power o1 o2 o3)
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun ~ (o1)
   (clpy.util:ensure-null-as-nil
@@ -249,8 +308,16 @@
 
 (defun **= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-power o1 o2)
+      (let* ((none (clpy.none:new))
+	     (res (clpy.ffi.fns:py-number-in-place-power o1 o2 none)))
+	(clpy.object:dec-ref none)
+	res)
     (error 'py.exc:generic-error)))
+
+(defun **%= (o1 o2 o3)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-number-in-place-power o1 o2 o3)
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun <<= (o1 o2)
   (clpy.util:ensure-null-as-nil
@@ -283,4 +350,3 @@
       (clpy.ffi.fns:py-number-absolute o)
     (error 'py.exc:generic-error)))
 
-;; conversion

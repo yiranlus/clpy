@@ -1,14 +1,15 @@
 (asdf:defsystem "clpy"
   :depends-on ("cl-autowrap"
-               "cl-autowrap/libffi"
+               ;;"cl-autowrap/libffi"
                "cl-plus-c"
                "alexandria"
-               "trivia"
-               "log4cl"
+	       "sb-posix"
+               ;;"trivia"
+               ;;"log4cl"
                "cffi")
   :components ((:module clpy-inc
                 :pathname "include"
-                :components ((:static-file "Python.h")))
+                :components ((:static-file "stable-api.h")))
                (:module clpy-spec
                 :pathname "spec")
                (:module clpy-lib
@@ -16,74 +17,63 @@
                (:module "src"
                 :components ((:file "library")
                              (:file "ffi" :depends-on ("library"))
+			     
+                             (:file "util" :depends-on ("object"))
+			     (:file "smart")
+			     
+                             (:file "package" :depends-on ("util" "smart" "object" "interpreter" "exception" "import" "eval"))
 
-                             (:file "utils")
-                             (:file "package" :depends-on ("ffi" "utils" "smart" "object" "import"))
-
-                             (:file "object" :depends-on ("ffi"))
-
-                             (:file "core" :depends-on ("ffi"))
-                             (:file "runtime" :depends-on ("core" "utils"))
-                             (:file "initfinal" :depends-on ("core" "utils"))
-
-                             (:file "pylet" :depends-on ("object"))
                              
-                             (:file "types" :depends-on ("ffi"))
-                             (:file "exception" :depends-on ("ffi"))
-                             (:file "error" :depends-on ("exception" "utils" "core"))
-                             
-                             (:file "object-basic" :depends-on ("object" "types"))
-                             (:file "object-attr" :depends-on ("object" "utils" "error"))
-                             (:file "object-repr" :depends-on ("object" "utils" "error"))
-                             (:file "object-item" :depends-on ("object" "utils" "error"))
-                             (:file "object-query" :depends-on ("object" "utils" "error"))
-                             (:file "object-call" :depends-on ("object" "smart" "utils" "error"))
-                             
-                             (:file "number" :depends-on ("ffi" "smart-new" "types" "utils" "error"))
-                             (:file "bool" :depends-on ("types" "smart-new" "utils" "error"))
-                             (:file "bytes" :depends-on ("types" "smart-new" "utils" "error"))
-                             (:file "byte-array" :depends-on ("types" "smart-new" "utils" "error"))
-                             (:file "unicode" :depends-on ("types" "smart-new" "utils" "error"))
-                             
-                             (:file "list" :depends-on ("types" "smart-new" "utils" "error"))
-                             (:file "tuple" :depends-on ("types" "smart-new" "utils" "error"))
-                             (:file "set" :depends-on ("types" "smart-new" "utils" "pylet" "error"))
-                             (:file "dict" :depends-on ("types" "smart-new" "utils" "pylet" "sequence" "error"))
-                             
-                             (:file "sequence" :depends-on ("types" "utils" "pylet"))
-                             (:file "mapping" :depends-on ("types" "utils" "pylet" "object"))
-                             (:file "buffer" :depends-on ("ffi"))
-                             (:file "slice" :depends-on ("ffi" "utils" "types" "error"))
-                             (:file "iter" :depends-on ("ffi" "utils" "error"))
-                             (:file "codec" :depends-on ("ffi" "utils" "error"))
+                             (:file "exception" :depends-on ("ffi" "util"))
+                             (:file "error" :depends-on ("ffi" "util" "str" "bytes" "object" "exception"))
 
-                             (:file "memory" :depends-on ("ffi" "object"))
+			     (:file "object")
+			     (:file "object-base" :depends-on ("object" "ffi" "util" "type"))
+			     (:file "object-proto" :depends-on ("object" "ffi" "util"))
+                             ;; (:file "object-attr" :depends-on ("object" "utils" "error"))
+                             ;; (:file "object-repr" :depends-on ("object" "utils" "error"))
+                             ;; (:file "object-item" :depends-on ("object" "utils" "error"))
+                             ;; (:file "object-query" :depends-on ("object" "utils" "error"))
+                             (:file "object-call" :depends-on ("object" "list" "dict" "util" "exception"))
 
-                             (:file "module" :depends-on ("ffi" "types" "utils" "error"))
-                             (:file "import" :depends-on ("ffi" "smart" "utils" "unicode" "dict" "list"))
-                             (:file "capsule" :depends-on ("ffi" "utils" "error"))
-
-                             (:file "smart")
-                             (:file "smart-new" :depends-on ("error"))
-                             (:file "smart-print" :depends-on ("object" "pylet" "unicode" "bytes"))
+			     ;; Data Types
+                             (:file "type" :depends-on ("ffi" "object"))
+			     (:file "none" :depends-on ("type" "smart"))
+                             (:file "number" :depends-on ("ffi" "smart" "type" "none" "util" "exception"))
+                             (:file "bool" :depends-on ("type" "smart" "util"))
+                             (:file "bytes" :depends-on ("type" "smart" "util" "exception"))
+                             (:file "byte-array" :depends-on ("type" "smart" "util" "exception"))
+                             (:file "str" :depends-on ("type" "smart" "util" "exception"))
                              
-                             ;;(:file "object" :depends-on ("clpy"))
-                             ;;(:file "complex" :depends-on ("object"))
-                             ;;(:file "bool" :depends-on ("package"))
-                             ;;(:file "exception" :depends-on ("ffi"))
-                             ;;(:file "object" :depends-on ("package"))
-                             ;;(:file "refcnt" :depends-on ("package"))
-                             ;;(:file "bytes" :depends-on ("package"))
-                             ;;(:file "byte-array" :depends-on ("package"))
-                             ;;(:file "tuple" :depends-on ("package"))
-                             ;;(:file "long" :depends-on ("package"))
-                             ;;(:file "error" :depends-on ("exception"))
-                             ;;(:file "init" :depends-on ("package"))
-                             ;;(:file "sys" :depends-on ("package"))
-                             ;;(:file "unicode" :depends-on ("package"))
-                             ;;(:file "call" :depends-on ("object"))
-                             ;;(:file "module" :depends-on ("object"))
-                             ;;(:file "import" :depends-on ("unicode"))
+                             (:file "list" :depends-on ("type" "util" "smart"))
+                             (:file "tuple" :depends-on ("type" "util" "smart"))
+                             (:file "set" :depends-on ("type" "util" "list" "smart"))
+                             (:file "dict" :depends-on ("type" "smart" "util" "sequence" "exception"))
+			     
+                             (:file "slice" :depends-on ("ffi" "util" "type" "exception"))
+
+
+			     (:file "file" :depends-on ("ffi" "util" "exception"))
+			     
+			     ;; Protocols
+                             (:file "sequence" :depends-on ("type" "util" "exception"))
+                             (:file "mapping" :depends-on ("type" "util" "object" "exception"))
+                             (:file "buffer" :depends-on ("ffi" "util" "exception"))
+                             (:file "iterator" :depends-on ("ffi" "util" "exception"))
+                             ;; (:file "codec" :depends-on ("ffi" "utils" "error"))
+
+			     ;; Module-Related
+                             ;; (:file "module" :depends-on ("ffi" "type" "utils" "error"))
+                             (:file "import" :depends-on ("ffi" "smart" "util" "str" "dict" "list"))
+                             ;; (:file "capsule" :depends-on ("ffi" "utils" "error"))
+
+			     ;; Interpreter-Related
+			     (:file "gc" :depends-on ("ffi"))
+			     (:file "interpreter" :depends-on ("ffi" "util"))
+			     (:file "eval" :depends-on ("ffi" "util" "exception"))
+			     (:file "frame" :depends-on ("ffi" "type"))
+                             ;; (:file "memory" :depends-on ("ffi" "object"))
+                             
                              )))
   :in-order-to ((test-op (test-op "clpy/test"))))
 
@@ -99,14 +89,15 @@
                (:file "byte-array" :depends-on ("package"))
                (:file "list" :depends-on ("package"))
                (:file "tuple" :depends-on ("package"))
-               (:file "unicode" :depends-on ("package"))
-               (:file "object" :depends-on ("package"))
+               ;; (:file "unicode" :depends-on ("package"))
+               ;; (:file "object" :depends-on ("package"))
                (:file "set" :depends-on ("package"))
                (:file "dict" :depends-on ("package"))
-               (:file "buffer" :depends-on ("package"))
-               (:file "import" :depends-on ("package"))
-               (:file "object-call" :depends-on ("package"))
-               (:file "smart" :depends-on ("package")))
+               ;; (:file "buffer" :depends-on ("package"))
+               ;; (:file "import" :depends-on ("package"))
+               ;; (:file "object-call" :depends-on ("package"))
+               ;; (:file "smart" :depends-on ("package"))
+	       )
   :perform (test-op (op c)
                     (symbol-call :fiveam :run!
                                  (find-symbol* :clpy :clpy.test))))

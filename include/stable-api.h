@@ -77,9 +77,6 @@ typedef struct {
     void *internal;
 } Py_buffer;
 
-typedef int (*getbufferproc)(PyObject *, Py_buffer *, int);
-typedef void (*releasebufferproc)(PyObject *, Py_buffer *);
-
 
 __attribute__ ((visibility ("default"))) int PyObject_CheckBuffer(PyObject *obj);
 
@@ -133,16 +130,7 @@ __attribute__ ((visibility ("default"))) int PyBuffer_FillInfo(Py_buffer *view, 
 __attribute__ ((visibility ("default"))) void PyBuffer_Release(Py_buffer *view);
 struct _object {
    
-    union {
-       Py_ssize_t ob_refcnt;
-
-       uint32_t ob_refcnt_split[2];
-
-    };
-
-
-
-
+    Py_ssize_t ob_refcnt;
     PyTypeObject *ob_type;
 };
 
@@ -179,35 +167,14 @@ static inline PyTypeObject* Py_TYPE(PyObject *ob) {
 
 
 
-extern __attribute__ ((visibility ("default"))) PyTypeObject PyLong_Type;
-extern __attribute__ ((visibility ("default"))) PyTypeObject PyBool_Type;
-
 
 static inline Py_ssize_t Py_SIZE(PyObject *ob) {
-    
-   ob->ob_type != &PyLong_Type
-   ob->ob_type != &PyLong_Type
-   "ob->ob_type != &PyLong_Type"
-                                      ;
-    
-   ob->ob_type != &PyBool_Type
-   ob->ob_type != &PyBool_Type
-   "ob->ob_type != &PyBool_Type"
-                                      ;
-    return ((PyVarObject*)((ob)))->ob_size;
+    PyVarObject *var_ob = ((PyVarObject*)((ob)));
+    return var_ob->ob_size;
 }
 
 
 
-
-static inline __attribute__((always_inline)) int _Py_IsImmortal(PyObject *op)
-{
-
-    return ((int32_t)(op->ob_refcnt)) < 0;
-
-
-
-}
 
 
 static inline int Py_IS_TYPE(PyObject *ob, PyTypeObject *type) {
@@ -219,13 +186,6 @@ static inline int Py_IS_TYPE(PyObject *ob, PyTypeObject *type) {
 
 
 static inline void Py_SET_REFCNT(PyObject *ob, Py_ssize_t refcnt) {
-
-
-
-
-    if (_Py_IsImmortal(((PyObject*)((ob))))) {
-        return;
-    }
     ob->ob_refcnt = refcnt;
 }
 
@@ -240,17 +200,8 @@ static inline void Py_SET_TYPE(PyObject *ob, PyTypeObject *type) {
 
 
 
+
 static inline void Py_SET_SIZE(PyVarObject *ob, Py_ssize_t size) {
-    
-   ob->ob_base.ob_type != &PyLong_Type
-   ob->ob_base.ob_type != &PyLong_Type
-   "ob->ob_base.ob_type != &PyLong_Type"
-                                              ;
-    
-   ob->ob_base.ob_type != &PyBool_Type
-   ob->ob_base.ob_type != &PyBool_Type
-   "ob->ob_base.ob_type != &PyBool_Type"
-                                              ;
     ob->ob_size = size;
 }
 typedef PyObject * (*unaryfunc)(PyObject *);
@@ -286,11 +237,6 @@ typedef int (*initproc)(PyObject *, PyObject *, PyObject *);
 typedef PyObject *(*newfunc)(PyTypeObject *, PyObject *, PyObject *);
 typedef PyObject *(*allocfunc)(PyTypeObject *, Py_ssize_t);
 
-
-typedef PyObject *(*vectorcallfunc)(PyObject *callable, PyObject *const *args,
-                                    size_t nargsf, PyObject *kwnames);
-
-
 typedef struct{
     int slot;
     void *pfunc;
@@ -319,11 +265,6 @@ __attribute__ ((visibility ("default"))) void * PyType_GetModuleState(PyTypeObje
 
 __attribute__ ((visibility ("default"))) PyObject * PyType_GetName(PyTypeObject *);
 __attribute__ ((visibility ("default"))) PyObject * PyType_GetQualName(PyTypeObject *);
-
-
-__attribute__ ((visibility ("default"))) PyObject * PyType_FromMetaclass(PyTypeObject*, PyObject*, PyType_Spec*, PyObject*);
-__attribute__ ((visibility ("default"))) void * PyObject_GetTypeData(PyObject *obj, PyTypeObject *cls);
-__attribute__ ((visibility ("default"))) Py_ssize_t PyType_GetTypeDataSize(PyTypeObject *cls);
 
 
 
@@ -397,22 +338,18 @@ __attribute__ ((visibility ("default"))) void Py_DecRef(PyObject *);
 __attribute__ ((visibility ("default"))) void _Py_IncRef(PyObject *);
 __attribute__ ((visibility ("default"))) void _Py_DecRef(PyObject *);
 
-static inline __attribute__((always_inline)) void Py_INCREF(PyObject *op)
+static inline void Py_INCREF(PyObject *op)
+{
+    op->ob_refcnt++;
+
+}
+static inline void Py_DECREF(PyObject *op)
 {
 
 
-
-
-
-
-    _Py_IncRef(op);
-}
-static inline void Py_DECREF(PyObject *op) {
-
-    _Py_DecRef(op);
-
-
-
+    if (--op->ob_refcnt == 0) {
+        _Py_Dealloc(op);
+    }
 }
 static inline void Py_XINCREF(PyObject *op)
 {
@@ -481,7 +418,7 @@ PyType_HasFeature(PyTypeObject *type, unsigned long feature)
 
 
 static inline int PyType_Check(PyObject *op) {
-    return PyType_HasFeature((Py_TYPE(op)), ((1UL << 31)));
+    return PyType_HasFeature(Py_TYPE(op), (1UL << 31));
 }
 
 
@@ -516,6 +453,10 @@ __attribute__ ((visibility ("default"))) Py_ssize_t PyGC_Collect(void);
 __attribute__ ((visibility ("default"))) int PyGC_Enable(void);
 __attribute__ ((visibility ("default"))) int PyGC_Disable(void);
 __attribute__ ((visibility ("default"))) int PyGC_IsEnabled(void);
+
+
+
+
 __attribute__ ((visibility ("default"))) PyVarObject * _PyObject_GC_Resize(PyVarObject *, Py_ssize_t);
 
 
@@ -641,6 +582,13 @@ __attribute__ ((visibility ("default"))) Py_ssize_t PyUnicode_GetLength(
 
 
 
+__attribute__((__deprecated__)) __attribute__ ((visibility ("default"))) Py_ssize_t PyUnicode_GetSize(
+    PyObject *unicode
+    );
+
+
+
+
 __attribute__ ((visibility ("default"))) Py_UCS4 PyUnicode_ReadChar(
     PyObject *unicode,
     Py_ssize_t index
@@ -682,6 +630,10 @@ __attribute__ ((visibility ("default"))) void PyUnicode_InternInPlace(PyObject *
 __attribute__ ((visibility ("default"))) PyObject * PyUnicode_InternFromString(
     const char *u
     );
+
+
+
+__attribute__((__deprecated__)) __attribute__ ((visibility ("default"))) void PyUnicode_InternImmortal(PyObject **);
 __attribute__ ((visibility ("default"))) PyObject* PyUnicode_FromWideChar(
     const wchar_t *w,
     Py_ssize_t size
@@ -930,23 +882,13 @@ __attribute__ ((visibility ("default"))) int PyUnicode_FSConverter(PyObject*, vo
 
 
 __attribute__ ((visibility ("default"))) int PyUnicode_FSDecoder(PyObject*, void*);
-
-
-
-
-
 __attribute__ ((visibility ("default"))) PyObject* PyUnicode_DecodeFSDefault(
     const char *s
     );
-
-
 __attribute__ ((visibility ("default"))) PyObject* PyUnicode_DecodeFSDefaultAndSize(
     const char *s,
     Py_ssize_t size
     );
-
-
-
 __attribute__ ((visibility ("default"))) PyObject* PyUnicode_EncodeFSDefault(
     PyObject *unicode
     );
@@ -1187,8 +1129,6 @@ __attribute__ ((visibility ("default"))) PyObject * PyErr_Occurred(void);
 __attribute__ ((visibility ("default"))) void PyErr_Clear(void);
 __attribute__ ((visibility ("default"))) void PyErr_Fetch(PyObject **, PyObject **, PyObject **);
 __attribute__ ((visibility ("default"))) void PyErr_Restore(PyObject *, PyObject *, PyObject *);
-__attribute__ ((visibility ("default"))) PyObject * PyErr_GetRaisedException(void);
-__attribute__ ((visibility ("default"))) void PyErr_SetRaisedException(PyObject *);
 
 __attribute__ ((visibility ("default"))) PyObject* PyErr_GetHandledException(void);
 __attribute__ ((visibility ("default"))) void PyErr_SetHandledException(PyObject *);
@@ -1221,10 +1161,6 @@ __attribute__ ((visibility ("default"))) void PyException_SetCause(PyObject *, P
 
 __attribute__ ((visibility ("default"))) PyObject * PyException_GetContext(PyObject *);
 __attribute__ ((visibility ("default"))) void PyException_SetContext(PyObject *, PyObject *);
-
-
-__attribute__ ((visibility ("default"))) PyObject * PyException_GetArgs(PyObject *);
-__attribute__ ((visibility ("default"))) void PyException_SetArgs(PyObject *, PyObject *);
 __attribute__ ((visibility ("default"))) const char * PyExceptionClass_Name(PyObject *);
 extern __attribute__ ((visibility ("default"))) PyObject * PyExc_BaseException;
 extern __attribute__ ((visibility ("default"))) PyObject * PyExc_Exception;
@@ -1452,6 +1388,12 @@ __attribute__ ((visibility ("default"))) int PyOS_snprintf(char *str, size_t siz
                         __attribute__((format(printf, 3, 4)));
 __attribute__ ((visibility ("default"))) int PyOS_vsnprintf(char *str, size_t size, const char *format, va_list va)
                         __attribute__((format(printf, 3, 0)));
+extern __attribute__ ((visibility ("default"))) PyTypeObject PyLong_Type;
+
+
+
+
+
 __attribute__ ((visibility ("default"))) PyObject * PyLong_FromLong(long);
 __attribute__ ((visibility ("default"))) PyObject * PyLong_FromUnsignedLong(unsigned long);
 __attribute__ ((visibility ("default"))) PyObject * PyLong_FromSize_t(size_t);
@@ -1496,6 +1438,14 @@ __attribute__ ((visibility ("default"))) PyObject * PyLong_FromString(const char
 
 __attribute__ ((visibility ("default"))) unsigned long PyOS_strtoul(const char *, char **, int);
 __attribute__ ((visibility ("default"))) long PyOS_strtol(const char *, char **, int);
+extern __attribute__ ((visibility ("default"))) PyTypeObject PyBool_Type;
+
+
+
+
+
+
+
 extern __attribute__ ((visibility ("default"))) PyLongObject _Py_FalseStruct;
 extern __attribute__ ((visibility ("default"))) PyLongObject _Py_TrueStruct;
 
@@ -1544,9 +1494,6 @@ extern __attribute__ ((visibility ("default"))) PyTypeObject PyRange_Type;
 extern __attribute__ ((visibility ("default"))) PyTypeObject PyRangeIter_Type;
 extern __attribute__ ((visibility ("default"))) PyTypeObject PyLongRangeIter_Type;
 extern __attribute__ ((visibility ("default"))) PyTypeObject PyMemoryView_Type;
-
-
-
 __attribute__ ((visibility ("default"))) PyObject * PyMemoryView_FromObject(PyObject *base);
 
 __attribute__ ((visibility ("default"))) PyObject * PyMemoryView_FromMemory(char *mem, Py_ssize_t size,
@@ -1747,22 +1694,8 @@ extern __attribute__ ((visibility ("default"))) PyTypeObject PyModuleDef_Type;
 
 typedef struct PyModuleDef_Base {
   PyObject ob_base;
-
-
-
-
-
-
   PyObject* (*m_init)(void);
-
-
-
-
   Py_ssize_t m_index;
-
-
-
-
   PyObject* m_copy;
 } PyModuleDef_Base;
 struct PyModuleDef_Slot {
@@ -1791,14 +1724,14 @@ __attribute__ ((visibility ("default"))) int PyObject_AsFileDescriptor(PyObject 
 
 
 
-__attribute__((__deprecated__)) extern __attribute__ ((visibility ("default"))) const char * Py_FileSystemDefaultEncoding;
+extern __attribute__ ((visibility ("default"))) const char * Py_FileSystemDefaultEncoding;
 
-__attribute__((__deprecated__)) extern __attribute__ ((visibility ("default"))) const char * Py_FileSystemDefaultEncodeErrors;
+extern __attribute__ ((visibility ("default"))) const char * Py_FileSystemDefaultEncodeErrors;
 
-__attribute__((__deprecated__)) extern __attribute__ ((visibility ("default"))) int Py_HasFileSystemDefaultEncoding;
+extern __attribute__ ((visibility ("default"))) int Py_HasFileSystemDefaultEncoding;
 
 
-__attribute__((__deprecated__)) extern __attribute__ ((visibility ("default"))) int Py_UTF8Mode;
+extern __attribute__ ((visibility ("default"))) int Py_UTF8Mode;
 extern __attribute__ ((visibility ("default"))) PyTypeObject PyCapsule_Type;
 
 typedef void (*PyCapsule_Destructor)(PyObject *);
@@ -1927,22 +1860,6 @@ __attribute__ ((visibility ("default"))) PyObject * PyDescr_NewGetSet(PyTypeObje
 
 __attribute__ ((visibility ("default"))) PyObject * PyDictProxy_New(PyObject *);
 __attribute__ ((visibility ("default"))) PyObject * PyWrapper_New(PyObject *, PyObject *);
-
-
-
-
-
-
-
-struct PyMemberDef {
-    const char *name;
-    int type;
-    Py_ssize_t offset;
-    int flags;
-    const char *doc;
-};
-__attribute__ ((visibility ("default"))) PyObject * PyMember_GetOne(const char *, PyMemberDef *);
-__attribute__ ((visibility ("default"))) int PyMember_SetOne(char *, PyMemberDef *, PyObject *);
 
 
 
@@ -2132,8 +2049,6 @@ __attribute__ ((visibility ("default"))) unsigned long PyThread_get_thread_ident
 
 
 
-
-
 __attribute__ ((visibility ("default"))) unsigned long PyThread_get_thread_native_id(void);
 
 
@@ -2191,6 +2106,8 @@ __attribute__ ((visibility ("default"))) PyObject * _Py_BuildValue_SizeT(const c
 __attribute__ ((visibility ("default"))) PyObject * _Py_BuildValue_SizeT(const char *, ...);
 
 
+
+
 __attribute__ ((visibility ("default"))) PyObject * _Py_VaBuildValue_SizeT(const char *, va_list);
 
 
@@ -2229,10 +2146,6 @@ __attribute__ ((visibility ("default"))) PyObject * Py_CompileString(const char 
 __attribute__ ((visibility ("default"))) void PyErr_Print(void);
 __attribute__ ((visibility ("default"))) void PyErr_PrintEx(int);
 __attribute__ ((visibility ("default"))) void PyErr_Display(PyObject *, PyObject *, PyObject *);
-
-
-__attribute__ ((visibility ("default"))) void PyErr_DisplayException(PyObject *);
-
 
 
 
@@ -2488,32 +2401,6 @@ __attribute__ ((visibility ("default"))) PyObject * PyObject_CallMethodObjArgs(
     PyObject *obj,
     PyObject *name,
     ...);
-
-
-
-
-
-__attribute__ ((visibility ("default"))) Py_ssize_t PyVectorcall_NARGS(size_t nargsf);
-
-
-
-__attribute__ ((visibility ("default"))) PyObject * PyVectorcall_Call(PyObject *callable, PyObject *tuple, PyObject *dict);
-
-
-
-
-
-
-__attribute__ ((visibility ("default"))) PyObject * PyObject_Vectorcall(
-    PyObject *callable,
-    PyObject *const *args,
-    size_t nargsf,
-    PyObject *kwnames);
-
-
-__attribute__ ((visibility ("default"))) PyObject * PyObject_VectorcallMethod(
-    PyObject *name, PyObject *const *args,
-    size_t nargsf, PyObject *kwnames);
 __attribute__ ((visibility ("default"))) PyObject * PyObject_Type(PyObject *o);
 __attribute__ ((visibility ("default"))) Py_ssize_t PyObject_Size(PyObject *o);
 

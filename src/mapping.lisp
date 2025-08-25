@@ -1,9 +1,10 @@
 (defpackage :clpy.mapping
   (:nicknames :py.map)
   (:use :cl)
-  (:shadow #:values)
+  (:shadow #:values #:length)
   (:export #:p
 	   #:size
+	   #:length
 	   #:get-item
 	   #:set-item
 	   #:del-tem
@@ -18,50 +19,50 @@
   (plusp (clpy.ffi.fns:py-mapping-check o)))
 
 (defun size (o)
-  (py:ensure-non-negative
+  (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-mapping-size o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
+
+(defun length (o)
+  (clpy.util:ensure-non-negative
+      (clpy.ffi.fns:py-mapping-length o)
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun get-item (o key)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (if (stringp key)
 	  (clpy.ffi.fns:py-mapping-get-item-string o key)
-	  (py.obj:get-item o key))
-    (error 'py.exc:generic-error)))
+	  (clpy.util:let ((-key (clpy.smart:new key)))
+	    (clpy.object:get-item o -key)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun set-item (o key value)
-  (py:ensure-zero
-      (py:let ((-value (clpy.smart:new value)))
-	(if (stringp key)
-	    (clpy.ffi.fns:py-mapping-set-item-string o key -value)
-	    (py.obj:set-item o key -value)))
-    (error 'py.exc:generic-error)))
-
-(defun del-item (o key)
-  (py:ensure-zero
-      (py:let ((-key (clpy.smart:new key)))
-	  (py.obj:del-item o -key))
-    (error 'py.exc:generic-error)))
+  (clpy.util:ensure-zero
+      (if (stringp key)
+	  (clpy.ffi.fns:py-mapping-set-item-string o key value)
+	  (clpy.util:let ((-key (clpy.smart:new key)))
+	    (clpy.object:set-item o -key value)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun has-key (o key)
   (plusp
    (if (stringp key)
        (clpy.ffi.fns:py-mapping-has-key-string o key)
-       (py:let ((-key (clpy.smart:new key)))
+       (clpy.util:let ((-key (clpy.smart:new key)))
 	 (clpy.ffi.fns:py-mapping-has-key o -key)))))
 
 (defun keys (o)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-mapping-keys o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun values (o)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-mapping-values o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 (defun items (o)
-  (py:ensure-null-as-nil
+  (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-mapping-items o)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
