@@ -22,5 +22,6 @@
 __pycache__
 .qlot/
 
+docs/_build
 gentool/stable-api.h
 gentool/stdint-gen
