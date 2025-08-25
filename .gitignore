@@ -21,3 +21,6 @@
 \#*.lisp#
 __pycache__
 .qlot/
+
+gentool/stable-api.h
+gentool/stdint-gen
