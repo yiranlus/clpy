@@ -16,7 +16,6 @@
 	   #:not-implemented
 	   
 	   #:new
-           ;; #:print
 
 	   ;; PyObject
 	   #:object-p
@@ -117,6 +116,7 @@
 
 	   ;; clpy.import
            #:import
+	   #:import-as
 
 	   ;; clpy.util
 	   #:let #:let*

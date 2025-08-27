@@ -5,6 +5,7 @@
            #:new
            #:p
            #:len
+	   #:size
            #:get-item
            #:get-slice
            #:set-item))
@@ -38,19 +39,22 @@
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))
 
-(defun len (o)
-  (clpy.ffi.fns:py-tuple-size o))
+(defun len (tuple)
+  (clpy.ffi.fns:py-tuple-size tuple))
 
-(defun get-item (o index)
+(defun size (tuple)
+  (len tuple))
+
+(defun get-item (tuple index)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-tuple-get-item o index)
+      (clpy.ffi.fns:py-tuple-get-item tuple index)
     (error 'py.exc:generic-error)))
 
-(defun set-item (o index value)
+(defun set-item (tuple index value)
   (clpy.util:ensure-zero
       (let ((-value (clpy.smart:new value)))
-	(clpy.ffi.fns:py-tuple-set-item o index -value))
+	(clpy.ffi.fns:py-tuple-set-item tuple index -value))
     (error 'py.exc:generic-error)))
 
-(defun get-slice (o low high)
-  (clpy.ffi.fns:py-tuple-get-slice o low high))
+(defun get-slice (tuple low high)
+  (clpy.ffi.fns:py-tuple-get-slice tuple low high))

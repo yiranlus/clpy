@@ -23,6 +23,8 @@ PRED returns t, NEW-FUNC takes that argument to create a new value."
 (new-hook #'null (lambda (x) nil))
 
 (defun new (x)
+  (when (clpy.object:p x)
+    (return-from new (clpy.object:new-ref x)))
   (loop for (pred . new-func) in *new-mapping*
         when (funcall pred x)
           do (return-from new (funcall new-func x)))

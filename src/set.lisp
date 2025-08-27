@@ -54,7 +54,7 @@
       (if items
 	  (clpy.util:let ((l (apply #'py.list:new items)))
 	    (clpy.ffi.fns:py-set-new l))
-	  (clpy.ffi.fns:py-set-new (cffi:null-pointer)))
+	  (clpy.ffi.fns:py-set-new nil))
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun new-from (iterable)

@@ -16,6 +16,7 @@
 	   #:keys
 	   #:values
 	   #:len
+	   #:size
 	   #:merge
 	   #:update))
 
@@ -43,7 +44,7 @@
   (clpy.type:of o :dict))
 
 (defun new (&rest mapping)
-  (let ((d (clpy.util:ensure-null-as-nil
+  (let ((dict (clpy.util:ensure-null-as-nil
 		  (clpy.ffi.fns:py-dict-new)
 		(error 'py.exc:generic-error :message "Unable to create new dict."))))
     (when (and mapping
@@ -52,8 +53,8 @@
       (loop for (k . v) in mapping
 	    do (clpy.util:let ((-k (clpy.smart:new k))
 			(-v  (clpy.smart:new v)))
-		 (set-item d -k -v))))
-    d))
+		 (set-item dict -k -v))))
+    dict))
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :dict (car x))))
                      #'(lambda (x) (apply #'new (cdr x))))
@@ -63,68 +64,71 @@
       (clpy.ffi.fns:py-dict-proxy-new mapping)
     (error 'py.exc:generic-error)))
 
-(defun clear (o)
-  (clpy.ffi.fns:py-dict-clear o))
+(defun clear (dict)
+  (clpy.ffi.fns:py-dict-clear dict))
 
-(defun contains (o key)
+(defun contains (dict key)
   (case (clpy.util:let ((-key (clpy.smart:new key)))
-	  (clpy.ffi.fns:py-dict-contains o -key))
+	  (clpy.ffi.fns:py-dict-contains dict -key))
     (1 t)
     (0 nil)
     (-1 (clpy.exception:raise-generic-or-python-error))))
 
-(defun copy (o)
+(defun copy (dict)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-copy o)
+      (clpy.ffi.fns:py-dict-copy dict)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun set-item (o key value)
+(defun set-item (dict key value)
   (clpy.util:ensure-non-negative
       (if (stringp key)
 	  (clpy.util:let ((-value (clpy.smart:new value)))
-	    (clpy.ffi.fns:py-dict-set-item-string o key -value))
+	    (clpy.ffi.fns:py-dict-set-item-string dict key -value))
 	  (clpy.util:let ((-key (clpy.smart:new key))
 		   (-value (clpy.smart:new value)))
-	    (clpy.ffi.fns:py-dict-set-item o -key -value)))
+	    (clpy.ffi.fns:py-dict-set-item dict -key -value)))
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun del-item (o key)
+(defun del-item (dict key)
   (clpy.util:ensure-non-negative
       (if (stringp key)
-	  (clpy.ffi.fns:py-dict-del-item-string o key)
+	  (clpy.ffi.fns:py-dict-del-item-string dict key)
 	  (clpy.util:let ((-key (clpy.smart:new key)))
 	    (clpy.ffi.fns:py-dict-del-item o -key)))
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun get-item (o key &optional suppress-error)
+(defun get-item (dict key &optional suppress-error)
   (clpy.util:ensure-null-as-nil
       (if suppress-error
 	  (if (stringp key)
-	      (clpy.ffi.fns:py-dict-get-item-string o key)
-	      (clpy.ffi.fns:py-dict-get-item o key))
-	  (clpy.util:let ((o (clpy.smart:new key)))
-	    (clpy.ffi.fns:py-dict-get-item-with-error o key)))
+	      (clpy.ffi.fns:py-dict-get-item-string dict key)
+	      (clpy.ffi.fns:py-dict-get-item dict key))
+	  (clpy.util:let ((-key (clpy.smart:new key)))
+	    (clpy.ffi.fns:py-dict-get-item-with-error dict -key)))
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun items (o)
+(defun items (dict)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-items o)
+      (clpy.ffi.fns:py-dict-items dict)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun keys (o)
+(defun keys (dict)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-keys o)
+      (clpy.ffi.fns:py-dict-keys dict)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun values (o)
+(defun values (dict)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-dict-values o)
+      (clpy.ffi.fns:py-dict-values dict)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun len (o)
+(defun len (dict)
   (clpy.util:ensure-non-negative
-      (clpy.ffi.fns:py-dict-size o)
+      (clpy.ffi.fns:py-dict-size dict)
     (clpy.exception:raise-generic-or-python-error)))
+
+(defun size (dict)
+  (len dict))
 
 (defun merge (dict-a dict-or-seq &key override)
   (clpy.util:ensure-zero
@@ -139,9 +143,9 @@
 				     (type-of dict-or-seq))))))
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun update (o dict &key override)
+(defun update (dict new-dict &key override)
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-dict-update o dict)
+      (clpy.ffi.fns:py-dict-update dict new-dict)
     (clpy.exception:raise-generic-or-python-error)))
 
 

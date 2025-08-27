@@ -7,6 +7,7 @@
 	   #:as-string
 	   #:concat
 	   #:repr
+	   #:len
 	   #:size))
 
 (cl:in-package :clpy.bytes)
@@ -51,16 +52,19 @@
       (clpy.exception:raise-generic-or-python-error))
     res))
 
-(defun repr (o i)
+(defun repr (bytes i)
   "Compute a string representation of ``O``.
 
 This generates a string similar to that returned by ``repr()''"
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-bytes-repr o i)
+      (clpy.ffi.fns:py-bytes-repr bytes i)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun size (o)
-  (clpy.ffi.fns:py-bytes-size o))
+(defun len (bytes)
+  (clpy.ffi.fns:py-bytes-size bytes))
+
+(defun size (bytes)
+  (len bytes))
 
 (defun concat (bytes newpart &key (delete t))
   (if delete

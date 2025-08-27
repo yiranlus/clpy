@@ -3,9 +3,10 @@
   (:use :cl)
   (:shadow #:import #:get)
   (:export #:import
+	   #:--import--
 	   #:add
 	   #:reload
-	   #:get ;; utility function
+	   #:import-as ;; utility function
 
 	   #:get-magic-number
 	   #:get-magic-tag
@@ -15,37 +16,50 @@
 
 (in-package :clpy.import)
 
-(defun import (name &key
-                      globals locals from-list (level 0) ;; PyImport_ImportModule
-                      pycode pathname cpathname          ;; PyImport_ExecCodeModule
-		      frozen)                            ;; PyImport_ImportFrozenModule
+;; PyImport_ImportModule
+;; PyImport_ExecCodeModule
+;; PyImport_ImportFrozenModule
+(defun import (name                     
+	       &optional type ;; either NIL, :exec-code, or :frozen
+	       &rest rest
+	       &key co pathname cpathname)                 
   "Import a module.
 
 The module can be a normal module, a code object (specified by PYCODE),
 or a frozen module (use FROZEN)."
-  (declare (ignore locals))
-  (when (and pycode frozen)
-    (error 'clpy.exception:generic-error
-	   :message "PYCODE and FROZEN can not both be T."))
+  (declare (ignore locals rest))
   (clpy.util:ensure-null-as-nil
-      (cond
-        (pycode (clpy.util:let ((-name (clpy.str:new name))
-				(-pathname (clpy.str:new pathname))
-				(-cpathname (clpy.str:new cpathname)))
-		  (clpy.ffi.fns:py-import-exec-code-module-object -name pycode -pathname -cpathname)))
-	(frozen (clpy.util:let ((-name (clpy.str:new name)))
-		  (clpy.ffi.fns:py-import-import-frozen-module-object -name)))
-        (t (clpy.util:let ((-name (clpy.str:new name))
-                           (-globals (if (clpy.object:p globals)
-					 (clpy.object:new-ref globals)
-					 (apply #'clpy.dict:new globals)))
-                           (-locals nil) ;; not used
-                           (-from-list (if (clpy.object:p from-list)
-					   (clpy.object:new-ref from-list)
-					   (apply #'clpy.list:new from-list))))
-             (clpy.ffi.fns:py-import-import-module-level-object -name -globals -locals -from-list level))))
+      (case type
+        (:exec-code (clpy.util:let ((-name (clpy.str:new name))
+				    (-pathname (clpy.str:new pathname))
+				    (-cpathname (clpy.str:new cpathname)))
+		      (clpy.ffi.fns:py-import-exec-code-module-object -name co -pathname -cpathname)))
+	(:frozen (clpy.util:let ((-name (clpy.str:new name)))
+		   (clpy.ffi.fns:py-import-import-frozen-module-object -name)))
+        (otherwise (if (stringp name)
+		       (clpy.ffi.fns:py-import-import-module name)
+		       (clpy.ffi.fns:py-import-import-module name))))
     (clpy.exception:raise-generic-or-python-error
      :message "Unable to import the module")))
+
+;; PyImport_ImportModuleLevelObject, or
+;; PyImport_ImportModuleEx
+(defun --import-- (name &key globals locals from-list (level 0))
+  "Import the module, but the return function is the top-level module
+if from-list is NIL."
+  (clpy.util:ensure-null-as-nil
+      (clpy.util:let ((-name (clpy.str:new name))
+                      (-globals (if (clpy.object:p globals)
+				    (clpy.object:new-ref globals)
+				    (apply #'clpy.dict:new globals)))
+                      (-locals nil) ;; not used
+                      (-from-list (if (clpy.object:p from-list)
+				      (clpy.object:new-ref from-list)
+				      (apply #'clpy.list:new from-list))))
+	(clpy.ffi.fns:py-import-import-module-level-object -name -globals -locals -from-list level))
+    (clpy.exception:raise-generic-or-python-error
+     :message "Unable to import the module.")))
+  
 
 (defun add (name)
   "Return the module object corresponding to a module name.
@@ -100,7 +114,36 @@ to load the module."
 
 ;; utility macro/function to import function
 
-(defun get (module attrs &key from)
-  (clpy.util:let ((-module (import module :from-list from)))
+(defun get (module attrs)
+  (clpy.util:let ((-module (import module)))
     (loop for attr in attrs
 	  collect (clpy.object:get-attr -module attr))))
+
+;; (import-as (((numpy . "numpy") (array . "array")
+;;                                (sum   . "sum"))
+;;             ("matplotlib" (plt . "pyplot")))
+;;   ;; run some code
+;; )
+
+
+(defmacro import-as (import-list &body body)
+  (format t "Hello Kitty!~%"))
+
+(defmacro import-as (import-list &body body)
+  (if import-list
+      (let* ((module-attrs (car import-list))
+	     (module (car module-attrs))
+	     (module-sym (if (listp module)
+			     (first module)
+			     (gensym)))
+	     (module-name (if (listp module)
+			      (second module)
+			      module)))
+	`(clpy.util:let ((,module-sym (import ,module-name)))
+	   ,(when (second module-attrs)
+	      `(clpy.util:let
+		   ,(loop for (attr-sym attr-name) in (second module-attrs)
+			  collect `(,attr-sym
+				    (clpy.object:get-attr ,module-sym ,attr-name)))
+		 (import-as ,(cdr import-list) ,@body)))))
+      `(progn ,@body)))

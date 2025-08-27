@@ -80,7 +80,7 @@ This equivalent to Python's `Py_XDECCREF."
   (new-ref +NONE+))
 
 (clpy.smart:new-hook #'(lambda (x) (eq x :none))
-		     #'(lambda (x) (new)))
+		     #'(lambda (x) (none)))
 
 (defparameter +NOT-IMPLEMENTED+
   (plus-c:c-ref
@@ -89,3 +89,6 @@ This equivalent to Python's `Py_XDECCREF."
 
 (defun not-implemented ()
   (new-ref +NOT-IMPLEMENTED+))
+
+(clpy.smart:new-hook #'(lambda (x) (eq x :not-implemented))
+		     #'(lambda (x) (not-implemented)))

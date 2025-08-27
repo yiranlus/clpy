@@ -18,8 +18,13 @@
       (clpy.ffi.fns:py-bool-from-long (if v 1 0))
     (error 'py.exc:generic-error)))
 
-(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :bool (car x))))
-		     #'(lambda (x) (apply #'new (cdr x))))
+(clpy.smart:new-hook #'(lambda (x)
+			 (or (eq x :true)
+			     (eq x :false)))
+		     #'(lambda (x)
+			 (if (eq x :true)
+			     (new t)
+			     (new nil))))
 
 (clpy.smart:print-hook #'p
 		       #'(lambda (x)

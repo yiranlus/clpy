@@ -59,9 +59,6 @@ Unicode object from a normal string, use :cl:function:new."
   (clpy.ffi.fns:py-unicode-from-string v))
 
 (defun new (str &optional (encoding :fs-default) &key errors stateful byte-order mapping)
-  (when (and (clpy.object:p str) (p str))
-    (return-from new (clpy.object:new-ref str)))
-  
   (let ((-errors (if errors errors (cffi:null-pointer)))
 	(-byte-order (if byte-order
 			 (autowrap:alloc :int)

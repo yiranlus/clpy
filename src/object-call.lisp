@@ -19,10 +19,10 @@
         (t (clpy.util:let ((-args-tuple
 			     (if (clpy.object:p args)
 				 (clpy.object:new-ref args)
-				 (clpy.util:let ((-args (apply #'clpy.list args)))
-				   (-args-tuple (py.list:as-tuple -args)))))
+				 (clpy.util:let ((-args (apply #'clpy.list:new args)))
+				   (clpy.list:as-tuple -args))))
 			   (-kwargs (if (clpy.object:p kwargs)
 					(clpy.object:new-ref kwargs)
 					(apply #'clpy.dict:new kwargs))))
-             (clpy.ffi.fns:py-object-call -args-tuple -kwargs))))))
+             (clpy.ffi.fns:py-object-call callable -args-tuple -kwargs))))))
 

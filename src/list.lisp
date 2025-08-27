@@ -7,6 +7,7 @@
 	   #:new-of
 	   #:new
 	   #:len
+	   #:size
 	   #:get-item
 	   #:set-item
 	   #:insert
@@ -41,75 +42,85 @@
 
 (defun new (&rest items)
   "Create a list from ITEMS."
-  (let ((l (new-of (length items))))
-    (loop for i in items
-	  for index from 0
-	  do (let ((py-i (clpy.smart:new i)))
-	       (set-item l index py-i)))
-    l))
+  (clpy.util:ensure-null-as-nil
+      (let ((l (new-of (length items))))
+	(loop for i in items
+	      for index from 0
+	      do ;; set-item steal the reference
+		 (let ((py-i (clpy.smart:new i)))
+		   (set-item l index py-i)))
+	l)
+    (clpy.exception:raise-generic-or-python-error
+     :message "Unable to create the list from~%~%~A~%~%" items)))
 
-(clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :list (car x))))
-		     #'(lambda (x) (apply #'new (cdr x))))
+(clpy.smart:new-hook #'(lambda (x)
+			 (and (listp x)
+			      (eq :list (car x))))
+		     #'(lambda (x)
+			 (apply #'new (cdr x))))
 
-(defun len (o)
-  "Get the size of the list object ``O``."
-  (clpy.ffi.fns:py-list-size o))
+(defun len (list)
+  "Get the size of the list object ``LIST``."
+  (clpy.ffi.fns:py-list-size list))
+
+(defun size (list)
+  (len list))
 
 ;; List access
-(defun get-item (o index)
-  "Get the element at the INDEX in the list object ``O``."
+(defun get-item (list index)
+  "Get the element at the INDEX in the list object ``LIST``."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-list-get-item o index)
+      (clpy.ffi.fns:py-list-get-item list index)
     (error 'py.exc:generic-error)))
 
-(defun set-item (o index value)
-  "Set the element at the INDEX to VALUE in the list object ``O``."
+(defun set-item (list index value)
+  "Set the element at the INDEX to VALUE in the list object ``LIST``."
   (clpy.util:ensure-zero
       (clpy.util:let ((-value (clpy.smart:new value)))
-	(clpy.ffi.fns:py-list-set-item o index -value))
+	(clpy.ffi.fns:py-list-set-item list index -value))
     (error 'py.exc:generic-error)))
 
-(defun insert (o index value)
-  "Insert a VALUE at the INDEX in the list object ``O``."
+(defun insert (list index value)
+  "Insert a VALUE at the INDEX in the list object ``LIST``."
   (clpy.util:ensure-zero
       (clpy.util:let ((-value (clpy.smart:new value)))
-	(clpy.ffi.fns:py-list-insert o index -value))
+	(clpy.ffi.fns:py-list-insert list index -value))
     (error 'py.exc:generic-error)))
 
-(defun append (o value)
-  "Append a VALUE to the list object ``O``."
+(defun append (list value)
+  "Append a VALUE to the list object ``LIST``."
   (clpy.util:ensure-zero
       (clpy.util:let ((-value (clpy.smart:new value)))
-	(clpy.ffi.fns:py-list-append o -value))
+	(clpy.ffi.fns:py-list-append list -value))
     (error 'py.exc:generic-error)))
 
-(defun get-slice (o low high)
-  "Get a slice of list object ``O``. The index are from LOW to HIGH."
-  (clpy.ffi.fns:py-list-get-slice o low high))
+(defun get-slice (list low high)
+  "Get a slice of list object ``LIST``. The index are from LOW to HIGH."
+  (clpy.ffi.fns:py-list-get-slice list low high))
 
-(defun set-slice (o low high items)
-  "Set the slice of list object ``O`` from LOW to HIGh to items.
+(defun set-slice (list low high items)
+  "Set the slice of list object ``LIST`` from LOW to HIGh to items.
 
 This is akin to Python `list[low:high]=items`, the ITEMS can be NIL."
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-list-set-slice o low high items)
+      (clpy.ffi.fns:py-list-set-slice list low high items)
     (error 'py.exc:generic-error)))
 
-(defun sort (o)
-  "Sort the list object ``O`` in place."
+(defun sort (list)
+  "Sort the list object ``LIST`` in place."
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-list-sort o)
+      (clpy.ffi.fns:py-list-sort list)
     (error 'py.exc:generic-error)))
 
-(defun reverse (o)
-  "Reverse the list object ``O`` in place."
+(defun reverse (list)
+  "Reverse the list object ``LIST`` in place."
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-list-reverse o)
+      (clpy.ffi.fns:py-list-reverse list)
     (error 'py.exc:generic-error)))
 
-(defun as-tuple (o)
+(defun as-tuple (list)
   "Return a new tuple object containing the contents of list.
 
-This is equivalent to Python ``tuple(o)``."
+This is equivalent to Python ``tuple(list)``."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-list-as-tuple o)))
+      (clpy.ffi.fns:py-list-as-tuple list)))

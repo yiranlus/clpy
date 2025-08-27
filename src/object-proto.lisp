@@ -112,17 +112,17 @@ This is equivalent to ``o1 is o2`` in Python."
   (plusp (clpy.ffi.fns:py-is o1 o2)))
 
 
-(defun true-p (o &optional (exact-p nil))
+(defun true-p (o &key (exact nil))
   "Test if ``O`` is True.
 
 Return ``T`` if the object ``O`` is considered to be true. If EXACT-P
 is ``T``, then this is equivalent to ``o is True``."
   (plusp
    (clpy.util:ensure-non-negative
-    (if exact-p
-	  (clpy.ffi.fns:py-is-true o)
-           (clpy.ffi.fns:py-object-is-true o))
-       (clpy.exception:raise-generic-or-python-error))))
+    (if exact
+	(clpy.ffi.fns:py-is-true o)
+        (clpy.ffi.fns:py-object-is-true o))
+     (clpy.exception:raise-generic-or-python-error))))
 
 
 (defun none-p (o)

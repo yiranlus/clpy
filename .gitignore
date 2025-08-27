@@ -25,3 +25,6 @@ __pycache__
 docs/_build
 gentool/stable-api.h
 gentool/stdint-gen
+
+.venv/
+.conda/

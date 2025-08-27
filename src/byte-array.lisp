@@ -35,16 +35,16 @@
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :byte-array (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))
 
-(defun concat (o1 o2)
+(defun concat (ba1 ba2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-byte-array-concat o1 o2)
+      (clpy.ffi.fns:py-byte-array-concat ba1 ba2)
     (error 'clpy.exception:generic-error)))
 
-(defun size (o)
-  (clpy.ffi.fns:py-byte-array-size o))
+(defun size (ba)
+  (clpy.ffi.fns:py-byte-array-size ba))
 
-(defun as-string (o)
-  (clpy.ffi.fns:py-byte-array-as-string o))
+(defun as-string (ba)
+  (clpy.ffi.fns:py-byte-array-as-string ba))
 
-(defun resize (o length)
-  (clpy.ffi.fns:py-byte-array-resize o length))
+(defun resize (ba length)
+  (clpy.ffi.fns:py-byte-array-resize ba length))

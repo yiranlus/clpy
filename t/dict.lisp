@@ -8,36 +8,36 @@
 
 (test new-empty-dict
   (py:let ((dict (py.dict:new)))
-    (is (= 0 (py.dict:size dict)))))
+    (is (= 0 (py.dict:len dict)))))
 
 (test new-dict-1
   (py:let ((dict (py.dict:new
 		  (cons "key 1" "value 1")
 		  (cons "key 2" "value 2")
 		  (cons "key 3" 3))))
-    (is (= 3 (py.dict:size dict)))
+    (is (= 3 (py.dict:len dict)))
     (py:let ((v (py.str:encode (py.dict:get-item dict "key 1"))))
       (is (string-equal "value 1" (py.bytes:as-string v))))))
 
 ;; (test new-dict-with-nil
 ;;   (py:let ((dict (py.dict:new nil)))
-;;     (is (= 0 (py.dict:size dict)))))
+;;     (is (= 0 (py.dict:len dict)))))
 
 (test clear-dict
   (py:let ((dict (py.dict:new
 		  (cons "key 1" "value 1")
 		  (cons "key 2" "value 2")
 		  (cons "key 3" 3))))
-    (is (= 3 (py.dict:size dict)))
+    (is (= 3 (py.dict:len dict)))
     (py.dict:clear dict)
-    (is (= 0 (py.dict:size dict)))))
+    (is (= 0 (py.dict:len dict)))))
 
 (test dict-contains
   (py:let ((dict (py.dict:new
 		  (cons "key 1" "value 1")
 		  (cons "key 2" "value 2")
 		  (cons "key 3" 3))))
-    (is (= 3 (py.dict:size dict)))
+    (is (= 3 (py.dict:len dict)))
     (is-true (py.dict:contains dict "key 1"))
     (is-false (py.dict:contains dict "key-non-exist"))))
 
@@ -56,7 +56,7 @@
 		  (cons "key 2" "value 2")
 		  (cons "key 3" 3))))
     (py:let ((keys (py.dict:keys dict)))
-      (is (= 3 (py.list:size keys))))))
+      (is (= 3 (py.list:len keys))))))
 
 (test dict-values
   (py:let ((dict (py.dict:new
@@ -64,7 +64,7 @@
 		  (cons "key 2" "value 2")
 		  (cons "key 3" 3))))
     (py:let ((values (py.dict:values dict)))
-      (is (= 3 (py.list:size values))))))
+      (is (= 3 (py.list:len values))))))
 
 (test dict-merge-non-override
   (py:let ((dict-merged (py.dict:new
@@ -76,7 +76,7 @@
 		   (cons "key4" "value 4")
 		   (cons "key5" 7))))
     (py.dict:merge dict-merged dict2)
-    (is (= 5 (py.dict:size dict-merged)))
+    (is (= 5 (py.dict:len dict-merged)))
     (py:let ((key3-v (py.dict:get-item dict-merged "key3")))
       (is-true (py.type:of key3-v :long))
       (is (= 3 (py.num:as-integer key3-v))))))
@@ -91,11 +91,12 @@
 		   (cons "key4" "value 4")
 		   (cons "key5" 7))))
     (py.dict:merge dict-merged dict2 :override t)
-    (is (= 5 (py.dict:size dict-merged)))
-    (py:let ((key3-v (py.dict:get-item dict-merged "key3")))
+    (is (= 5 (py.dict:len dict-merged)))
+    ;; borrowed reference, use normal get
+    (let ((key3-v (py.dict:get-item dict-merged "key3")))
       (is-false (py.type:of key3-v :long))
       (is-true (py.type:of key3-v :str))
-      (py:let ((v (py.str:encode key3-v)))
+      '(py:let ((v (py.str:encode key3-v)))
 	(is (string-equal "value 1 updated" (py.bytes:as-string v)))))))
 
 '(test dict-merge-update
@@ -108,7 +109,7 @@
 		   (cons "key4" "value 4")
 		   (cons "key5" 7))))
     (py.dict:update dict-merged dict2)
-    (is (= 5 (py.dict:size dict-merged)))
+    (is (= 5 (py.dict:len dict-merged)))
     (py:let ((key3-v (py.dict:get-item dict-merged "key3")))
       (is-false (py.type:of key3-v :long))
       (is-true (py.type:of key3-v :str))

@@ -24,6 +24,10 @@
   (py:let ((l (py.list:new 1 2 3 4 5 6)))
     (is (= 6 (py.list:size l)))))
 
+(test new-list-with-string
+  '(py:let ((l (py.list:new "ta" "dlkfj" "lkdsjf" "dsfj")))
+    (is (= 4 (py.list:size l)))))
+
 (test append-items
   (py:let ((l (py.list:new 1 2 3 4 5)))
     (dotimes (i 5)

@@ -96,9 +96,6 @@
              ((<= nbits 64) (clpy.ffi.fns:py-long-from-long-long value))))))))
 
 (defun new (n &optional (type nil type-p))
-  (when (cl:and (clpy.object:p n) (p n))
-    (return-from new (clpy.object:new-ref n)))
-  
   (clpy.util:ensure-null-as-nil
       (cond
 	((stringp n)
@@ -123,40 +120,40 @@
 	   (otherwise (new-long n :method type)))))
     (error 'py.exc:generic-error :message (format nil "Unable to create PyObject for ~A." n))))
 
-(defun as-double (o)
-  (case (py.obj:ob-type o)
-    (:float (clpy.ffi.fns:py-float-as-double o))
-    (:long (clpy.ffi.fns:py-long-as-double o))
+(defun as-double (number)
+  (case (py.obj:ob-type number)
+    (:float (clpy.ffi.fns:py-float-as-double number))
+    (:long (clpy.ffi.fns:py-long-as-double number))
     (otherwise (error "Unsupported type to convert to double."))))
 
-(defun real (o)
-  (clpy.ffi.fns:py-complex-real-as-double o))
+(defun real (number)
+  (clpy.ffi.fns:py-complex-real-as-double number))
 
-(defun imag (o)
-  (clpy.ffi.fns:py-complex-imag-as-double o))
+(defun imag (number)
+  (clpy.ffi.fns:py-complex-imag-as-double number))
 
-(defun as-complex (o)
-  (clpy.util:let ((r (real o))
-		  (i (imag o)))
+(defun as-complex (number)
+  (clpy.util:let ((r (real number))
+		  (i (imag number)))
     (complex r i)))
 
-(defun as-integer (o &optional (type :long) (mask nil))
-  (unless (clpy.type:of o :long)
-    (error "O is not a PyLong."))
+(defun as-integer (number &optional (type :long) (mask nil))
+  (unless (clpy.type:of number :long)
+    (error "NUMBER is not a PyLong."))
   (case type
     ;;(:int (clpy.ffi.fns:py-long-as-int 0))
-    (:long (clpy.ffi.fns:py-long-as-long o))
-    (:long-long (clpy.ffi.fns:py-long-as-long-long o))
-    (:ssize-t (clpy.ffi.fns:py-long-as-ssize-t o))
+    (:long (clpy.ffi.fns:py-long-as-long number))
+    (:long-long (clpy.ffi.fns:py-long-as-long-long number))
+    (:ssize-t (clpy.ffi.fns:py-long-as-ssize-t number))
     (:usigned-long
      (if mask
-	 (clpy.ffi.fns:py-long-as-unsigned-long-mask o)
-	 (clpy.ffi.fns:py-long-as-unsigned-long o)))
+	 (clpy.ffi.fns:py-long-as-unsigned-long-mask number)
+	 (clpy.ffi.fns:py-long-as-unsigned-long number)))
     (:unsigned-long-long
      (if mask
-	 (clpy.ffi.fns:py-long-as-unsigned-long-long-mask o)
-	 (clpy.ffi.fns:py-long-as-unsigned-long-long o)))
-    (:size-t (clpy.ffi.fns:py-long-as-size-t o))))
+	 (clpy.ffi.fns:py-long-as-unsigned-long-long-mask number)
+	 (clpy.ffi.fns:py-long-as-unsigned-long-long number)))
+    (:size-t (clpy.ffi.fns:py-long-as-size-t number))))
 
 ;; smart
 
@@ -168,25 +165,25 @@
 
 ;; conversion
 
-(defun int (o)
+(defun int (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-long o)
+      (clpy.ffi.fns:py-number-long number)
     (error 'py.exc:generic-error)))
 
-(defun float (o)
+(defun float (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-float o)
+      (clpy.ffi.fns:py-number-float number)
     (error 'py.exc:generic-error)))
 
-(defun index (o)
+(defun index (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-index o)
+      (clpy.ffi.fns:py-number-index number)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun to-base (o base)
-  "Return the integer ``o`` converted to base base as a string."
+(defun to-base (number base)
+  "Return the integer ``number`` converted to base base as a string."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-to-base o base)
+      (clpy.ffi.fns:py-number-to-base number base)
     (clpy.exception:raise-generic-or-python-error)))
 
 ;; operations
@@ -354,8 +351,8 @@
     (error 'py.exc:generic-error)))
 
 ;; util functions
-(defun abs (o)
+(defun abs (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-absolute o)
+      (clpy.ffi.fns:py-number-absolute number)
     (error 'py.exc:generic-error)))
 
