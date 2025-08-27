@@ -4,7 +4,7 @@
   (:export #:new-of
            #:new
            #:p
-           #:size
+           #:len
            #:get-item
            #:get-slice
            #:set-item))
@@ -38,7 +38,7 @@
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :tuple (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))
 
-(defun size (o)
+(defun len (o)
   (clpy.ffi.fns:py-tuple-size o))
 
 (defun get-item (o index)

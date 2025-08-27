@@ -15,7 +15,7 @@
 	   #:items
 	   #:keys
 	   #:values
-	   #:size
+	   #:len
 	   #:merge
 	   #:update))
 
@@ -57,7 +57,6 @@
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :dict (car x))))
                      #'(lambda (x) (apply #'new (cdr x))))
-
 
 (defun proxy-new (mapping)
   (clpy.util:ensure-null-as-nil
@@ -122,7 +121,7 @@
       (clpy.ffi.fns:py-dict-values o)
     (clpy.exception:raise-generic-or-python-error)))
 
-(defun size (o)
+(defun len (o)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-dict-size o)
     (clpy.exception:raise-generic-or-python-error)))

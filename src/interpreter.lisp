@@ -22,12 +22,28 @@
            #:get-python-home
 	   #:get-recursion-limit
 
+	   #:enter-recursive-call
+	   #:leave-recursive-call
+	   #:repr-enter
+	   #:repr-leave
+
 	   #:state-new
 	   #:state-get
 	   #:state-get-id
 	   #:state-get-dict
 	   #:state-clear
-	   #:state-delete))
+	   #:state-delete
+
+	   #:fatal-error
+	   #:main
+	   #:exit
+	   #:at-exit
+
+	   #:new-interpreter
+	   #:end-interpreter
+
+	   #:add-pending-call
+	   #:make-panding-calls))
 
 (in-package :clpy.interpreter)
 
@@ -135,6 +151,30 @@ of the current Python interpreter instance."
   "Return the recursion limit."
   (clpy.ffi.fns:py-get-recursion-limit))
 
+(defun set-recursion-limit (n)
+  "Set the recursion limit."
+  (clpy.ffi.fns:py-set-recursion-limit n))
+
+;; Recursive Control
+
+(defun enter-recursive-call (where)
+  "Marks a point where a recursive C-level call is about to be performed."
+  (clpy.util:ensure-zero
+      (clpy.ffi.fns:py-enter-recursive-call where)
+    (clpy.exception:raise-generic-or-python-error)))
+
+(defun leave-recursive-call ()
+  (clpy.ffi.fns:py-leave-recursive-call))
+
+
+(defun repr-enter (obj)
+  (clpy.util:ensure-zero
+      (clpy.ffi.fns:py-repr-enter obj)
+    (clpy.exception:raise-generic-or-python-error)))
+
+(defun repr-leave (obj)
+  (clpy.ffi.fns:py-repr-leave))
+
 ;; Interpreter State
 
 (defun state-new ()
@@ -154,3 +194,47 @@ of the current Python interpreter instance."
 
 (defun state-delete (interp)
   (clpy.ffi.fns:py-interpreter-state-delete interp))
+
+;; Process Control
+
+(defun main (argv)
+  (error "Not implemented yet."))
+
+(defun fatal-error (message)
+  (clpy.ffi.fns:py-fatal-error message))
+
+(defun exit (status)
+  (clpy.ffi.fns:py-exit status))
+
+(defun at-exit (func)
+  "Call a function at exit.
+
+The function should be a void function without argument."
+  (clpy.ffi.fns:py-at-exit func))
+
+;; Sub-interpreter
+
+(defun new-interpreter ()
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-new-interpreter)
+    (error 'clpy.exception:generic-error
+	   :message "Failed to create a sub-interpreter.")))
+
+(defun end-interpreter (tstate)
+  "Destroy the (sub-)interpreter reprensted by the given thread state."
+  (clpy.ffi.fns:py-end-interpreter tstate))
+
+;; Schedule function call
+
+(defun add-pending-call (func arg)
+  "Schedule a function to be called later.
+
+FUNC should have signature ``int (void *)`` and ARG is a ``void*``."
+  (clpy.util:ensure-zero
+      (clpy.ffi.fns:py-add-pending-call func arg)
+    (clpy.exception:raise-generic-or-python-error)))
+
+(defun make-pending-calls ()
+  (clpy.util:ensure-zero
+      (clpy.ffi.fns:py-make-pending-calls)
+    (clpy.exception:raise-generic-or-python-error)))

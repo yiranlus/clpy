@@ -30,20 +30,19 @@ PRED returns t, NEW-FUNC takes that argument to create a new value."
 
 ;; Print a Python object smartly
 
-;; (defparameter *print-mapping* (make-hash-table))
+(defparameter *print-mapping* '())
 
-;; (defun print-hook (type print-func)
-;;   "Add a smart type to the mapping."
-;;   (setf (gethash type *print-mapping*) print-func))
+(defun print-hook (pred print-func)
+  "Add a smart type to the mapping."
+  (push (cons pred print-func) *print-mapping*))
 
-;; (defun print (x &optional stream)
-;;   (if (clpy.object:p x)
-;;       (let ((type (clpy.object:ob-type x)))
-;;         (write-string (if (and (keywordp type)
-;;                                (gethash type *print-mapping*))
-;;                           (funcall (gethash type *print-mapping*) x)
-;;                           (clpy.util:let* ((repr (clpy.obj:repr x))
-;;                                            (code (clpy.str:encode repr)))
-;;                             (py.bytes:as-string code)))
-;;                       stream))
-;;       (princ x stream)))
+(defun print (x &optional (stream *standard-output*))
+  (loop for (pred . print-func) in *print-mapping*
+	when (funcall pred x)
+	  do (return-from print
+	       (values t
+		       (let ((res (funcall print-func x)))
+			 (if *print-escape*
+			     (format stream "~S" res)
+			     (format stream "~A" res)))))))
+

@@ -1,6 +1,6 @@
 (cl:defpackage :clpy.bytes
   (:nicknames :py.bytes)
-  (:use :cl)
+  (:use :cl :plus-c)
   (:export #:new
 	   #:p
 	   #:exact-p
@@ -22,15 +22,24 @@
 (defun exact-p (o)
   (clpy.type:of o :bytes))
 
-(defun new (v)
+(defun new (v &key escaped errors consumed)
   "Create a bytes object from ``V``.
 
 ``V`` can either be a string or a PyObject."
-  (clpy.util:ensure-null-as-nil
-      (if (stringp v)
-	  (clpy.ffi.fns:py-bytes-from-string v)
-	  (clpy.ffi.fns:py-bytes-from-object v))
-    (error 'clpy.exception:generic-error)))
+  
+  (if (stringp v)
+      (if escaped
+	  (c-with ((consumed clpy.ffi:py-ssize-t))
+		  (let ((res (clpy.util:ensure-null-as-nil
+			      (clpy.ffi.fns:py-bytes-decode-escape v (length v) errors (consumed &))
+			      (clpy.exception:raise-generic-or-python-error))))
+		    (values res consumed)))
+	  (clpy.util:ensure-null-as-nil
+	   (clpy.ffi.fns:py-bytes-from-string v)
+	   (clpy.exception:raise-generic-or-python-error)))
+      (clpy.util:ensure-null-as-nil
+       (clpy.ffi.fns:py-bytes-from-object v)
+       (clpy.exception:raise-generic-or-python-error))))
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :bytes (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))

@@ -1,11 +1,13 @@
 (defpackage :clpy.util
+  (:nicknames :py.u)
   (:use :cl)
   (:shadow #:let #:let*)
   (:export #:ensure-null-as-nil
 	   #:ensure-zero
 	   #:ensure-non-negative
 	   #:let
-	   #:let*))
+	   #:let*
+	   #:dec-xrefs))
 
 (in-package :clpy.util)
 
@@ -57,3 +59,7 @@
 			     `(clpy.object:dec-xref ,i)
 			     `(clpy.object:dec-xref ,(car i))))
 	 ,res))))
+
+(defun dec-xrefs (varlist)
+  (dolist (var varlist)
+    (clpy.object:dec-xref var)))

@@ -1,8 +1,11 @@
 (cl:defpackage :clpy.str
   (:nicknames :py.str)
   (:use :cl)
-  (:shadow #:replace #:find #:count #:length)
-  (:export #:new
+  (:shadow #:replace #:find #:count)
+  (:export #:+FILE-SYSTEM-DEFAULT-ENCODE-ERRORS+
+	   #:+FILE-SYSTEM-DEFAULT-ENCODING+
+	   #:+HAS-FILE-SYSTEM-DEFAULT-ENCODING+
+	   #:new
 	   #:new-from
 	   #:p
 	   #:encode
@@ -18,9 +21,24 @@
 	   #:count
 	   #:tail-match
 	   #:contains
-	   #:length))
+	   #:len))
 
 (cl:in-package :clpy.str)
+
+(cffi:defcvar ("Py_FileSystemDefaultEncodeErrors"
+	       +FILE-SYSTEM-DEFAULT-ENCODE-ERRORS+
+	       :read-only t)
+  :string)
+
+(cffi:defcvar ("Py_FileSystemDefaultEncoding"
+	       +FILE-SYSTEM-DEFAULT-ENCODING+
+	       :read-only t)
+  :string)
+
+(cffi:defcvar ("Py_HasFileSystemDefaultEncoding"
+	       +HAS-FILE-SYSTEM-DEFAULT-ENCODING+
+	       :read-only t)
+  :int)
 
 (clpy.type:define-type "PyUnicode_Type" str)
 (clpy.type:define-type "PyUnicodeIter_Type" str-iter)
@@ -41,6 +59,9 @@ Unicode object from a normal string, use :cl:function:new."
   (clpy.ffi.fns:py-unicode-from-string v))
 
 (defun new (str &optional (encoding :fs-default) &key errors stateful byte-order mapping)
+  (when (and (clpy.object:p str) (p str))
+    (return-from new (clpy.object:new-ref str)))
+  
   (let ((-errors (if errors errors (cffi:null-pointer)))
 	(-byte-order (if byte-order
 			 (autowrap:alloc :int)
@@ -50,34 +71,34 @@ Unicode object from a normal string, use :cl:function:new."
 	    (clpy.util:ensure-null-as-nil
 		(cond
 		  ((stringp encoding)
-		   (clpy.ffi.fns:py-unicode-decode str (cl:length str) encoding -errors))
+		   (clpy.ffi.fns:py-unicode-decode str (length str) encoding -errors))
 		  (mapping
-		   (clpy.ffi.fns:py-unicode-decode-charmap str (cl:length str) mapping -errors))
+		   (clpy.ffi.fns:py-unicode-decode-charmap str (length str) mapping -errors))
 		  (stateful
 		   (plus-c:c-with ((consumed clpy.ffi:py-ssize-t))
 		     (case encoding
-		       (:utf8 (clpy.ffi.fns:py-unicode-decode-utf8stateful str (cl:length str) -errors))
-		       (:utf32 (clpy.ffi.fns:py-unicode-decode-utf32stateful str (cl:length str) -errors -byte-order))
-		       (:utf16 (clpy.ffi.fns:py-unicode-decode-utf16stateful str (cl:length str) -errors -byte-order))
-		       (:utf7 (clpy.ffi.fns:py-unicode-decode-utf7stateful str (cl:length str) -errors))
+		       (:utf8 (clpy.ffi.fns:py-unicode-decode-utf8stateful str (length str) -errors))
+		       (:utf32 (clpy.ffi.fns:py-unicode-decode-utf32stateful str (length str) -errors -byte-order))
+		       (:utf16 (clpy.ffi.fns:py-unicode-decode-utf16stateful str (length str) -errors -byte-order))
+		       (:utf7 (clpy.ffi.fns:py-unicode-decode-utf7stateful str (length str) -errors))
 		       #+win32
-		       (:mbcs (clpy.ffi.fns:py-unicode-decode-mbcs-stateful str (cl:length str) -errors))
+		       (:mbcs (clpy.ffi.fns:py-unicode-decode-mbcs-stateful str (length str) -errors))
 		       (otherwise (error (format nil "Decoder of ~A does not have a statefull version." encoding))))
 		     (setf -consumed consumed)))
 		  (t
 		   (case encoding
 		     (:locale (clpy.ffi.fns:py-unicode-decode-locale str -errors))
 		     (:fs-default (clpy.ffi.fns:py-unicode-decode-fs-default str))
-		     (:unicode-escape (clpy.ffi.fns:py-unicode-decode-unicode-escape str (cl:length str) -errors))
-		     (:raw-unicode-escape (clpy.ffi.fns:py-unicode-decode-raw-unicode-escape str (cl:length str) -errors))
-		     (:utf8 (clpy.ffi.fns:py-unicode-decode-utf8 str (cl:length str) -errors))
-		     (:utf32 (clpy.ffi.fns:py-unicode-decode-utf32 str (cl:length str) -errors -byte-order))
-		     (:utf16 (clpy.ffi.fns:py-unicode-decode-utf16 str (cl:length str) -errors -byte-order))
-		     (:utf7 (clpy.ffi.fns:py-unicode-decode-utf7 str (cl:length str) -errors))
-		     (:latin1 (clpy.ffi.fns:py-unicode-decode-latin1 str (cl:length str) -errors))
-		     (:ascii (clpy.ffi.fns:py-unicode-decode-ascii str (cl:length str) -errors))
+		     (:unicode-escape (clpy.ffi.fns:py-unicode-decode-unicode-escape str (length str) -errors))
+		     (:raw-unicode-escape (clpy.ffi.fns:py-unicode-decode-raw-unicode-escape str (length str) -errors))
+		     (:utf8 (clpy.ffi.fns:py-unicode-decode-utf8 str (length str) -errors))
+		     (:utf32 (clpy.ffi.fns:py-unicode-decode-utf32 str (length str) -errors -byte-order))
+		     (:utf16 (clpy.ffi.fns:py-unicode-decode-utf16 str (length str) -errors -byte-order))
+		     (:utf7 (clpy.ffi.fns:py-unicode-decode-utf7 str (length str) -errors))
+		     (:latin1 (clpy.ffi.fns:py-unicode-decode-latin1 str (length str) -errors))
+		     (:ascii (clpy.ffi.fns:py-unicode-decode-ascii str (length str) -errors))
 		     #+win32
-		     (:mbcs (clpy.ffi.fns:py-unicode-decode-mbcs str (cl:length str) -errors)))))
+		     (:mbcs (clpy.ffi.fns:py-unicode-decode-mbcs str (length str) -errors)))))
 	      (error 'py.exc:generic-error))))
       (when byte-order
 	(autowrap:free -byte-order))
@@ -181,7 +202,7 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
 
 (defun find (unicode substr &optional (start 0) end (direction :forward))
   (let ((res (clpy.ffi.fns:py-unicode-find unicode substr
-					   start (or end (length unicode))
+					   start (or end (len unicode))
 					   (case direction
 					     (:forward 1)
 					     (:backward -1)))))
@@ -191,7 +212,7 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
 
 (defun find-char (unicode ch start end direction)
   (let ((res (clpy.ffi.fns:py-unicode-find-char unicode ch
-						start (or end (length unicode))
+						start (or end (len unicode))
 						(case direction
 						  (:forward 1)
 						  (:backward -1)))))
@@ -201,7 +222,7 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
 
 (defun count (unicode substr &optional (start 0) end)
   (let ((res (clpy.ffi.fns:py-unicode-count unicode substr
-					    start (or end (length unicode)))))
+					    start (or end (len unicode)))))
     (if (= res -2)
 	(error 'py.exc:generic-error)
 	res)))
@@ -211,7 +232,7 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
 
 DIRECTION can be :FORWARD which mean a suffix match; or :BACKWARD which
 means prefix match."
-  (let ((-end (or end (1- (length unicode)))))
+  (let ((-end (or end (1- (len unicode)))))
     (clpy.util:ensure-non-negative
 	(clpy.ffi.fns:py-unicode-tailmatch
 	 unicode substr start -end
@@ -225,7 +246,7 @@ means prefix match."
 (defun contains (unicode substr)
   (let ((res (clpy.ffi.fns:py-unicode-contains unicode substr)))
     (if (= res -2)
-	(error 'py.exc:generic-error)
+	(clpy.exception:raise-generic-or-python-error)
 	res)))
 
 (defun is-identifier (unicode)
@@ -234,9 +255,9 @@ means prefix match."
 
 ;; properties
 
-(defun length (unicode)
+(defun len (unicode)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-unicode-get-length unicode)
-    (error 'py.exc:generic-error)))
+    (clpy.exception:raise-generic-or-python-error)))
 
 

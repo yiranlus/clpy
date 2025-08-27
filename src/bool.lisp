@@ -20,3 +20,9 @@
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :bool (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))
+
+(clpy.smart:print-hook #'p
+		       #'(lambda (x)
+			   (if (clpy.object:true-p x t)
+			       "TRUE"
+			       "FALSE")))

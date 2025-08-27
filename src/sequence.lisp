@@ -1,9 +1,9 @@
 (defpackage :clpy.sequence
   (:nicknames :py.seq)
   (:use :cl)
-  (:shadow #:list #:count #:length)
+  (:shadow #:list #:count)
   (:export #:p
-	   #:length
+	   #:len
 	   #:concat #:concat=
 	   #:repeat #:repeat=
 	   #:get-item #:get-slice
@@ -19,7 +19,7 @@
 (defun p (o)
   (plusp (clpy.ffi.fns:py-sequence-check o)))
 
-(defun length (o)
+(defun len (o)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-sequence-length o)
     (clpy.exception:raise-generic-or-python-error)))

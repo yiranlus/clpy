@@ -1,10 +1,10 @@
 (defpackage :clpy.mapping
   (:nicknames :py.map)
   (:use :cl)
-  (:shadow #:values #:length)
+  (:shadow #:values)
   (:export #:p
 	   #:size
-	   #:length
+	   #:len
 	   #:get-item
 	   #:set-item
 	   #:del-tem
@@ -18,12 +18,12 @@
 (defun p (o)
   (plusp (clpy.ffi.fns:py-mapping-check o)))
 
-(defun size (o)
-  (clpy.util:ensure-non-negative
-      (clpy.ffi.fns:py-mapping-size o)
-    (clpy.exception:raise-generic-or-python-error)))
+;; (defun size (o)
+;;   (clpy.util:ensure-non-negative
+;;       (clpy.ffi.fns:py-mapping-size o)
+;;     (clpy.exception:raise-generic-or-python-error)))
 
-(defun length (o)
+(defun len (o)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-mapping-length o)
     (clpy.exception:raise-generic-or-python-error)))

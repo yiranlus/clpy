@@ -10,7 +10,7 @@
   :components ((:module clpy-inc
                 :pathname "include"
                 :components ((:static-file "stable-api.h")))
-               (:module clpy-spec
+               (:module clpy-spec 
                 :pathname "spec")
                (:module clpy-lib
                 :pathname "lib")
@@ -21,38 +21,31 @@
                              (:file "util" :depends-on ("object"))
 			     (:file "smart")
 			     
-                             (:file "package" :depends-on ("util" "smart" "object" "interpreter" "exception" "import" "eval"))
-
-                             
-                             (:file "exception" :depends-on ("ffi" "util"))
-                             (:file "error" :depends-on ("ffi" "util" "str" "bytes" "object" "exception"))
-
+                             (:file "exception" :depends-on ("ffi" "util" "object"))
+                             (:file "error" :depends-on ("ffi" "util" "str" "object" "exception"))
+			     
 			     (:file "object")
 			     (:file "object-base" :depends-on ("object" "ffi" "util" "type"))
-			     (:file "object-proto" :depends-on ("object" "ffi" "util"))
-                             ;; (:file "object-attr" :depends-on ("object" "utils" "error"))
-                             ;; (:file "object-repr" :depends-on ("object" "utils" "error"))
-                             ;; (:file "object-item" :depends-on ("object" "utils" "error"))
-                             ;; (:file "object-query" :depends-on ("object" "utils" "error"))
+			     (:file "object-proto" :depends-on ("object" "ffi" "str" "util"))
                              (:file "object-call" :depends-on ("object" "list" "dict" "util" "exception"))
-
+			     
 			     ;; Data Types
-                             (:file "type" :depends-on ("ffi" "object"))
-			     (:file "none" :depends-on ("type" "smart"))
-                             (:file "number" :depends-on ("ffi" "smart" "type" "none" "util" "exception"))
-                             (:file "bool" :depends-on ("type" "smart" "util"))
+                             (:file "type" :depends-on ("ffi" "object" "exception"))
+                             (:file "number" :depends-on ("ffi" "smart" "type" "object" "util" "exception"))
+                             (:file "bool" :depends-on ("ffi" "object" "type" "smart" "util"))
                              (:file "bytes" :depends-on ("type" "smart" "util" "exception"))
                              (:file "byte-array" :depends-on ("type" "smart" "util" "exception"))
                              (:file "str" :depends-on ("type" "smart" "util" "exception"))
                              
                              (:file "list" :depends-on ("type" "util" "smart"))
                              (:file "tuple" :depends-on ("type" "util" "smart"))
+			     (:file "named-tuple" :depends-on ("type" "str" "util" "smart" "exception"))
                              (:file "set" :depends-on ("type" "util" "list" "smart"))
                              (:file "dict" :depends-on ("type" "smart" "util" "sequence" "exception"))
 			     
-                             (:file "slice" :depends-on ("ffi" "util" "type" "exception"))
-
-
+                             (:file "slice" :depends-on ("ffi" "util" "smart" "number" "type" "exception"))
+			     
+			     
 			     (:file "file" :depends-on ("ffi" "util" "exception"))
 			     
 			     ;; Protocols
@@ -60,21 +53,34 @@
                              (:file "mapping" :depends-on ("type" "util" "object" "exception"))
                              (:file "buffer" :depends-on ("ffi" "util" "exception"))
                              (:file "iterator" :depends-on ("ffi" "util" "exception"))
-                             ;; (:file "codec" :depends-on ("ffi" "utils" "error"))
-
+                             (:file "codec" :depends-on ("ffi" "util" "exception"))
+			     (:file "weakref" :depends-on ("ffi" "util" "exception"))
+			     
 			     ;; Module-Related
-                             ;; (:file "module" :depends-on ("ffi" "type" "utils" "error"))
-                             (:file "import" :depends-on ("ffi" "smart" "util" "str" "dict" "list"))
-                             ;; (:file "capsule" :depends-on ("ffi" "utils" "error"))
+                             (:file "module" :depends-on ("ffi" "type" "util" "str" "exception"))
+			     (:file "state" :depends-on ("ffi" "util" "exception"))
+			     (:file "c-function" :depends-on ("ffi" "type" "util" "exception"))
+                             (:file "import" :depends-on ("ffi" "util" "str" "dict" "list" "exception"))
+                             (:file "capsule" :depends-on ("ffi" "type" "util" "exception"))
 
+			     (:file "descriptor" :depends-on ("ffi" "type" "util" "exception"))
+			     (:file "wrapper" :depends-on ("ffi" "type" "util" "exception"))
+			     (:file "member" :depends-on ("ffi" "type" "exception"))
+			     
 			     ;; Interpreter-Related
 			     (:file "gc" :depends-on ("ffi"))
-			     (:file "interpreter" :depends-on ("ffi" "util"))
-			     (:file "eval" :depends-on ("ffi" "util" "exception"))
-			     (:file "frame" :depends-on ("ffi" "type"))
-                             ;; (:file "memory" :depends-on ("ffi" "object"))
-                             
-                             )))
+			     (:file "interpreter" :depends-on ("ffi" "util" "c-function" "named-tuple"))
+			     (:file "gil" :depends-on ("ffi"))
+			     (:file "thread" :depends-on ("ffi" "exception"))
+			     (:file "system" :depends-on ("ffi" "exception"))
+			     (:file "os" :depends-on ("ffi" "exception"))
+			     (:file "eval" :depends-on ("ffi" "frame" "util" "exception"))
+			     (:file "traceback" :depends-on ("ffi" "type" "util" "exception"))
+			     (:file "frame" :depends-on ("ffi"))
+                             (:file "memory" :depends-on ("ffi" "exception"))
+			     (:file "memory-view" :depends-on ("ffi" "type" "object" "exception"))
+			     
+			     (:file "package" :depends-on ("util" "smart" "bytes" "str" "object" "interpreter" "exception" "import" "eval" "named-tuple" "c-function" "member")))))
   :in-order-to ((test-op (test-op "clpy/test"))))
 
 (asdf:defsystem "clpy/test"

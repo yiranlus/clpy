@@ -5,6 +5,7 @@
 	   #:int #:float #:and #:or #:xor)
   (:export #:new
 	   #:p
+	   #:index-p
 	   #:int-p
 	   #:int-exact-p
 	   #:float-p
@@ -29,25 +30,25 @@
 (clpy.type:define-type "PyComplex_Type" complex)
 
 (defun int-p (o)
-  (or (clpy.type:of o :long)
-      (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :long))))
+  (cl:or (clpy.type:of o :long)
+	 (clpy.type:subtype-p (clpy.object:ob-type o)
+			      (clpy.type:get :long))))
 
 (defun int-exact-p (o)
   (clpy.type:of o :long))
 
 (defun float-p (o)
-  (or (clpy.type:of o :float)
-      (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :float))))
+  (cl:or (clpy.type:of o :float)
+	 (clpy.type:subtype-p (clpy.object:ob-type o)
+			      (clpy.type:get :float))))
 
 (defun float-exact-p (o)
   (clpy.type:of o :float))
 
 (defun complex-p (o)
-  (or (clpy.type:of o :complex)
-      (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :complex))))
+  (cl:or (clpy.type:of o :complex)
+	 (clpy.type:subtype-p (clpy.object:ob-type o)
+			      (clpy.type:get :complex))))
 
 (defun complex-exact-p (o)
   (clpy.type:of o :complex))
@@ -55,6 +56,9 @@
 
 (defun p (o)
   (plusp (clpy.ffi.fns:py-number-check o)))
+
+(defun index-p (o)
+  (plusp (clpy.ffi.fns:py-index-check o)))
 
 (defun float-info ()
   (clpy.ffi.fns:py-float-get-info))
@@ -92,6 +96,9 @@
              ((<= nbits 64) (clpy.ffi.fns:py-long-from-long-long value))))))))
 
 (defun new (n &optional (type nil type-p))
+  (when (cl:and (clpy.object:p n) (p n))
+    (return-from new (clpy.object:new-ref n)))
+  
   (clpy.util:ensure-null-as-nil
       (cond
 	((stringp n)
@@ -128,6 +135,11 @@
 (defun imag (o)
   (clpy.ffi.fns:py-complex-imag-as-double o))
 
+(defun as-complex (o)
+  (clpy.util:let ((r (real o))
+		  (i (imag o)))
+    (complex r i)))
+
 (defun as-integer (o &optional (type :long) (mask nil))
   (unless (clpy.type:of o :long)
     (error "O is not a PyLong."))
@@ -149,13 +161,10 @@
 ;; smart
 
 (clpy.smart:new-hook #'numberp #'new)
-;; (clpy.smart:print-hook :long (lambda (x) (princ-to-string (as-integer x)))
-;; (clpy.smart:print-hook :float (lambda (x) (princ-to-string x)))
-;; (clpy.smart:print-hook :complex
-;;                        (lambda (x)
-;;                          (py:let ((r (real x))
-;;                                   (i (imag x)))
-;;                            (format nil "#(~A ~A)" r i))))
+
+(clpy.smart:print-hook #'int-p #'as-integer)
+(clpy.smart:print-hook #'float-p #'as-double)
+(clpy.smart:print-hook #'complex-p #'as-complex)
 
 ;; conversion
 
@@ -228,7 +237,7 @@
 
 (defun ** (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (let* ((none (clpy.none:new))
+      (let* ((none (clpy.object:none))
 	     (res (clpy.ffi.fns:py-number-power o1 o2 none)))
 	(clpy.object:dec-ref none)
 	res))
@@ -308,7 +317,7 @@
 
 (defun **= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (let* ((none (clpy.none:new))
+      (let* ((none (clpy.object:none))
 	     (res (clpy.ffi.fns:py-number-in-place-power o1 o2 none)))
 	(clpy.object:dec-ref none)
 	res)

@@ -1,43 +1,52 @@
 (defpackage :clpy.error
   (:nicknames :py.err)
   (:use :cl :plus-c)
-  (:export #:fetch
-	   #:fetch-as-string
-	   #:restore))
+  (:shadow #:print #:warn #:set)
+  (:export #:occurred
+	   #:print
+	   #:clear
+	   #:write-unraisable
+
+	   #:set
+	   #:set-from-errno
+	   #:set-import-error
+
+	   #:warn
+	   #:fetch
+	   #:restore
+	   #:exception-matches
+	   #:set-handled-exception
+	   #:get-handled-exception
+
+	   #:check-signals
+	   #:set-interrupt))
 
 (defpackage :clpy.exception
   (:nicknames :py.exc)
   (:use :cl)
   (:shadow #:type #:get)
-  (:export #:error-occurred
-	   #:clear-error
-	   #:print-error
-	   #:return-or-raise-python-error
+  (:export #:return-or-raise-python-error
 	   #:raise-generic-or-python-error
+	   #:define-exceptoin
 	   #:generic-error
 	   #:python-error
 	   #:type
 	   #:value
 	   #:*assoc-excs*
 	   #:from
-	   #:get))
+	   #:get
+
+	   #:name
+	   #:new-exception
+
+	   #:get-traceback
+	   #:set-traceback
+	   #:get-context
+	   #:set-context
+	   #:get-cause
+	   #:set-cause))
 
 (in-package :clpy.exception)
-
-(defun error-occurred ()
-  "Test whether the error indicator is set.
-
-If set, return the exception TYPE. You not own a reference to the
-return value, so you do not need to PY:DEC-REF it."
-  (from (clpy.util:ensure-null-as-nil
-	    (clpy.ffi.fns:py-err-occurred))))
-
-
-(defun clear-error ()
-  "Clear the error indicator.
-
-If the error indicator is not set, there is no effect."
-  (clpy.ffi.fns:py-err-clear))
 
 (defun -with-stderr-captured (thunk)
   "Run THUNK (a function of no args) with stderr redirected to a pipe.
@@ -70,24 +79,12 @@ Returns two values: the result of THUNK and the captured stderr as a string."
   `(-with-stderr-captured (lambda () ,@body)))
 
 
-(defun print-error (&optional (set-sys-last-vars 1) &rest rest &key (capture nil))
-  "Print a standard tracebak to ``sys.stderr`` and clear error indicator.
-
-Call this function only when the error indicator is set. Otherwise it
-will case a fatal error. If CAPTURE is ``T``, the printed error will
-be return as a string."
-  (if capture
-      (with-stderr-captured
-	(clpy.ffi.fns:py-err-print-ex set-sys-last-vars))
-      (clpy.ffi.fns:py-err-print-ex set-sys-last-vars)))
-
-
 (defun return-or-raise-python-error (v)
   "Return the value if no Python error occurs.
 
 If :cl:function:`error-occurred` is ``T``, this function will raise
 an error; otherwise, ``V`` is return."
-  (let ((exc (error-occurred)))
+  (let ((exc (clpy.error:occurred)))
     (if (cffi:null-pointer-p (autowrap:ptr exc))
 	(cl:error 'python-error :type (from exc))
 	v)))
@@ -98,7 +95,7 @@ an error; otherwise, ``V`` is return."
 
 If :cl:function:`error-occurred` return NULL, a GENERIC-ERROR will be
 raised; Otherwise, a Python error will be raised."
-  (let ((exc (error-occurred)))
+  (let ((exc (clpy.error:occurred)))
     (if exc
 	(error 'python-error :type exc :message message)
 	(error 'generic-error :message message))))
@@ -120,7 +117,7 @@ raised; Otherwise, a Python error will be raised."
 	 :reader message))
   (:report (lambda (condition stream)
 	     (format stream "~A: ~A~%" (type condition) (message condition))
-	     (format stream "~A~%" (print-error 1 :capture t)))))
+	     (format stream "~A~%" (py.err:print 1 :capture t)))))
 
 ;; Exception types
 (defparameter *assoc-excs* '()
@@ -225,3 +222,49 @@ is the reverse of :cl:function:`from`."
 (define-exception "PyExc_UserWarning" user-warning)
 (define-exception "PyExc_Warning" warning)
 
+;; Exception Classes
+
+(defun new-exception (name &key doc base dict)
+  "Cresate a new exception class.
+
+BASE and DICT are usually NULL. You can optionally specify a
+descriptoin for the exception class."
+  (if doc
+      (clpy.ffi.fns:py-err-new-exception-with-doc name doc base dict)
+      (clpy.ffi.fns:py-err-new-exception name base dict)))
+
+(defun name (ex)
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-exception-class-name ex)
+    (raise-generic-or-python-error)))
+
+(defun get-traceback (ex)
+  (clpy.ffi.fns:py-exception-get-traceback ex))
+
+(defun set-traceback (ex tb)
+  "Set the traceback associated with exception to TB.
+
+Use NIL to clear it."
+  (clpy.util:let ((tb (if tb
+			  (clpy.object:new-ref tb)
+			  (clpy.object:none))))
+    (clpy.ffi.fns:py-exception-set-traceback ex tb)))
+
+(defun get-context (ex)
+  (clpy.ffi.fns:py-exception-get-context ex))
+
+(defun set-context (ex ctx)
+  "Set the context associated with the exception to CTX.
+
+Use NIL to clear it."
+  (clpy.ffi.fns:py-exception-get-context ex ctx))
+
+
+(defun get-cause (ex)
+  (clpy.ffi.fns:py-exception-get-cause ex))
+
+(defun set-cause (ex cause)
+  "Set the cause associated with the exception.
+
+Use NIL to clear it."
+  (clpy.ffi.fns:py-exception-set-cause ex cause))

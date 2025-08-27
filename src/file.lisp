@@ -2,11 +2,19 @@
   (:nicknames :py.file)
   (:use :cl)
   (:shadow #:write-string)
-  (:export #:get-line
+  (:export #:from-fd
+	   #:get-line
 	   #:write-object
 	   #:write-string))
 
 (in-package :clpy.file)
+
+(defun from-fd (fd mode &key (buffering -1) encoding errors newline (closefd t))
+  (declare (ignore name))
+  (clpy.util:ensure-null-as-nil
+      (clpy.ffi.fns:py-file-from-fd fd nil mode buffering encoding errors newline (if closefd 1 0))
+    (clpy.exception:raise-generic-or-python-error
+     :message "Unable to create a file object from the file descriptor.")))
 
 (defun get-line (o &optional (n 0))
   (clpy.util:ensure-null-as-nil

@@ -4,16 +4,29 @@
   "Check if `O` is a PyObject."
   (typep o 'clpy.ffi:py-object))
 
+(defun var-p (o)
+  (typep o 'clpy.ffi:py-var-object))
+
 ;; PyObject basic operations
 
 (defun ob-refcnt (obj)
-  "Return ob_refcnt of the PyObject."
-  (clpy.ffi.acc:py-object.ob-refcnt obj))
+  "Return ob_refcnt of the PyObject or PyVarObject."
+  (if (p obj)
+      (clpy.ffi.acc:py-object.ob-refcnt obj)
+      (clpy.ffi.acc:py-var-object.ob-base.ob-refcnt obj)))
 
 (defun ob-type (obj)
-  "Return ob_type of the PyObject."
-  (let ((pto (clpy.ffi.acc:py-object.ob-type obj)))
+  "Return ob_type of the PyObject or PyVarObject."
+  (let ((pto (if (p obj)
+		 (clpy.ffi.acc:py-object.ob-type obj)
+		 (clpy.ffi.acc:py-var-object.ob-base.ob-type))))
     (or (clpy.type:from pto) pto)))
+
+(defun ob-base (vobj)
+  (clpy.ffi.acc:py-var-object.ob-base vobj))
+
+(defun ob-size (vobj)
+  (clpy.ffi.acc:py-var-object.ob-size vobj))
 
 (defun new-ref (o)
   "Create a strong reference to `O` and return it."
@@ -58,7 +71,21 @@ This equivalent to Python's `Py_XDECCREF."
 
 ;; Some hacks: Define None and NotImplemented
 
+(defparameter +NONE+
+  (plus-c:c-ref
+   (cffi:foreign-symbol-pointer "_Py_NoneStruct")
+   clpy.ffi:py-object))
+
+(defun none ()
+  (new-ref +NONE+))
+
+(clpy.smart:new-hook #'(lambda (x) (eq x :none))
+		     #'(lambda (x) (new)))
+
+(defparameter +NOT-IMPLEMENTED+
+  (plus-c:c-ref
+   (cffi:foreign-symbol-pointer "_Py_NotImplementedStruct")
+   clpy.ffi:py-object))
+
 (defun not-implemented ()
-  (new-ref (plus-c:c-ref
-	    (cffi:foreign-symbol-pointer "_Py_NotImplementedStruct")
-	    clpy.ffi:py-object)))
+  (new-ref +NOT-IMPLEMENTED+))

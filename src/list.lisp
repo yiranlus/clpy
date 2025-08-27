@@ -6,7 +6,7 @@
 	   #:exact-p
 	   #:new-of
 	   #:new
-	   #:size
+	   #:len
 	   #:get-item
 	   #:set-item
 	   #:insert
@@ -15,7 +15,8 @@
 	   #:set-slice
 	   #:sort
 	   #:reverse
-	   #:as-tuple))
+	   #:as-tuple
+	   #:clpy.obje))
 
 (in-package :clpy.list)
 
@@ -50,7 +51,7 @@
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :list (car x))))
 		     #'(lambda (x) (apply #'new (cdr x))))
 
-(defun size (o)
+(defun len (o)
   "Get the size of the list object ``O``."
   (clpy.ffi.fns:py-list-size o))
 

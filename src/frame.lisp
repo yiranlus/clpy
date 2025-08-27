@@ -7,6 +7,9 @@
 
 (in-package :clpy.frame)
 
+(defun p (o)
+  (typep o 'clpy.ffi:py-frame-object))
+
 (defun get-code (frame)
   "Return the FRAME code."
   (clpy.ffi.fns:py-frame-get-code frame))

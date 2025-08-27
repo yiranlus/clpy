@@ -2,9 +2,15 @@
   (:nicknames :py.obj)
   (:use :cl)
   (:shadow #:format #:type #:not)
-  (:export #:p
+  (:export #:+GENERIC-GET-ATTR+
+	   #:+GENERIC-SET-ATTR+
+	   #:+GENERIC-GET-DICT+
+	   #:+GENERIC-SET-DICT+
+	   #:p
 	   #:ob-refcnt
 	   #:ob-type
+	   #:ob-base
+	   #:ob-size
 	   #:new-ref
 	   #:new-xref
            #:inc-ref
@@ -12,38 +18,45 @@
            #:dec-ref
 	   #:dec-xref
 
+	   #:init
+	   #:init-var
+
 	   ;; constant
+	   #:+NONE+
+	   #:none
+	   #:+NOT-IMPLEMENTED+
 	   #:not-implemented
 
 	   ;; attr
 	   #:has-attr
            #:get-attr
            #:set-attr
-           ;;#:generic-get-attr
-           ;;#:generic-set-attr
-           ;;#:generic-get-dict
-           ;;#:generic-set-dict
+           #:get-dict
+           #:set-dict
+	   #:get-item
+	   #:set-item
+	   #:del-item
            #:dir
 
            ;; query
-           ;;#:rich-compare
-           ;;#:format
+           #:rich-compare
+           #:format
            #:repr
            #:ascii
            #:str
            #:bytes
-           ;;#:is-subclass
+           #:is-subclass
            #:is-instance
-           ;;#:hash
-           ;;#:hash-not-implemented
+           #:hash
+           #:hash-not-implemented
            #:true-p
 	   #:false-p
 	   #:none-p
            #:not
-           ;;#:type
+           #:type
 
            ;; item
-           #:size
+           #:len
            #:get-item
            #:set-item
            #:del-item
@@ -53,4 +66,15 @@
 	   ;; function calling
            #:callable-p
            #:call
-           ))
+
+	   #:self-iter
+	   #:get-iter
+	   #:get-a-iter
+
+	   #:as-fd
+
+	   #:clear-weakrefs
+	   #:malloc
+	   #:calloc
+	   #:realloc
+	   #:free))
