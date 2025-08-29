@@ -9,13 +9,13 @@
 (in-package :clpy.module-def)
 
 (defun create (&key
-		 name
-		 docstring
-		 size
-		 methods
-		 slots
-		 traverse
-		 clear
-		 free)
+                 name
+                 docstring
+                 size
+                 methods
+                 slots
+                 traverse
+                 clear
+                 free)
   (c-let ((module-def clpy.ffi:py-module-def :calloc t))
     (initialize))

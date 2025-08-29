@@ -2,8 +2,8 @@
   (:nicknames :py.gil)
   (:use :cl)
   (:export #:ensure
-	   #:release
-	   #:get-this-thread-state))
+           #:release
+           #:get-this-thread-state))
 
 (in-package :clpy.gil)
 

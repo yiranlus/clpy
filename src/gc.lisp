@@ -2,15 +2,15 @@
   (:nicknames :py.gc)
   (:use :cl)
   (:export #:collect
-	   #:enable
-	   #:disable
-	   #:enabled-p
+           #:enable
+           #:disable
+           #:enabled-p
 
-	   #:track
-	   #:tracked-p
-	   #:finalized-p
-	   #:del
-	   #:untrack))
+           #:track
+           #:tracked-p
+           #:finalized-p
+           #:del
+           #:untrack))
 
 (in-package :clpy.gc)
 

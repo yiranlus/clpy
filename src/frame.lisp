@@ -2,8 +2,8 @@
   (:nicknames :py.frame)
   (:use :cl)
   (:export #:p
-	   #:get-code
-	   #:get-line-number))
+           #:get-code
+           #:get-line-number))
 
 (in-package :clpy.frame)
 

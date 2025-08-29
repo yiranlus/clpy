@@ -2,10 +2,10 @@
   (:nicknames :py.os)
   (:use :cl)
   (:export #:fs-path
-	   #:interrupt-occurred
-	   #:before-fore
-	   #:after-fork-parent
-	   #:after-fork-child))
+           #:interrupt-occurred
+           #:before-fore
+           #:after-fork-parent
+           #:after-fork-child))
 
 (in-package :clpy.os)
 
@@ -17,7 +17,7 @@
 (defun fs-path (path)
   (clpy.util:ensure-null-as-nil
       (clpy.util:let ((path-str (clpy.str:new path)))
-	(clpy.ffi.fns:py-os-fs-path path-str))
+        (clpy.ffi.fns:py-os-fs-path path-str))
     (clpy.exception:raise-generic-or-python-error
      :message "Failed to get the FS representation for the path.")))
 

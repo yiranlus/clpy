@@ -3,17 +3,17 @@
   (:use :cl)
   (:shadow #:import)
   (:export #:p
-	   #:valid-p
-	   #:defdestructor
-	   #:new
-	   #:get-name
-	   #:set-name
-	   #:get-pointer
-	   #:set-pointer
-	   #:get-destructor
-	   #:set-destructor
-	   #:get-context
-	   #:set-context))
+           #:valid-p
+           #:defdestructor
+           #:new
+           #:get-name
+           #:set-name
+           #:get-pointer
+           #:set-pointer
+           #:get-destructor
+           #:set-destructor
+           #:get-context
+           #:set-context))
 
 (in-package :clpy.capsule)
 

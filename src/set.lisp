@@ -3,21 +3,21 @@
   (:use :cl)
   (:shadow #:pop)
   (:export #:p
-	   #:exact-p
-	   #:fronzen-p
-	   #:frozen-exact-p
-	   #:any-p
-	   #:any-exact-p
-	   #:new
-	   #:new-from
-	   #:frozen-new
-	   #:frozen-new-from
-	   #:size
-	   #:add
-	   #:clear
-	   #:discard
-	   #:contains
-	   #:pop))
+           #:exact-p
+           #:fronzen-p
+           #:frozen-exact-p
+           #:any-p
+           #:any-exact-p
+           #:new
+           #:new-from
+           #:frozen-new
+           #:frozen-new-from
+           #:size
+           #:add
+           #:clear
+           #:discard
+           #:contains
+           #:pop))
 
 (in-package :clpy.set)
 
@@ -27,7 +27,7 @@
 (defun p (o)
   (or (clpy.type:of o :set)
       (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :set))))
+                           (clpy.type:get :set))))
 
 (defun exact-p (o)
   (clpy.type:of o :set))
@@ -36,7 +36,7 @@
   "Check if ``O`` is a fronzen set."
   (or (clpy.type:of o :frozen-set)
       (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :frozen-set))))
+                           (clpy.type:get :frozen-set))))
 
 (defun frozen-exact (o)
   (clpy.type:of o :frozen-set))
@@ -52,26 +52,26 @@
 (defun new (&rest items)
   (clpy.util:ensure-null-as-nil
       (if items
-	  (clpy.util:let ((l (apply #'py.list:new items)))
-	    (clpy.ffi.fns:py-set-new l))
-	  (clpy.ffi.fns:py-set-new nil))
+          (clpy.util:let ((l (apply #'py.list:new items)))
+            (clpy.ffi.fns:py-set-new l))
+          (clpy.ffi.fns:py-set-new nil))
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun new-from (iterable)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-set-new iterable)
     (clpy.exception:raise-generic-or-python-error)))
-      
+
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :set (car x))))
-		     #'(lambda (x) (apply #'new (cdr x))))
+                     #'(lambda (x) (apply #'new (cdr x))))
 
 (defun frozen-new (&rest items)
   (clpy.util:ensure-null-as-nil
       (if items
-	  (clpy.util:let ((l (apply #'py.list:new items)))
-	    (clpy.ffi.fns:py-set-new l))
-	  (clpy.ffi.fns:py-frozen-set-new (cffi:null-pointer)))
+          (clpy.util:let ((l (apply #'py.list:new items)))
+            (clpy.ffi.fns:py-set-new l))
+          (clpy.ffi.fns:py-frozen-set-new (cffi:null-pointer)))
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun frozen-new-from (iterable)
@@ -80,7 +80,7 @@
     (clpy.exception:raise-generic-or-python-error)))
 
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :frozen-set (car x))))
-		     #'(lambda (x) (apply #'clpy.set:frozen-new (cdr x))))
+                     #'(lambda (x) (apply #'clpy.set:frozen-new (cdr x))))
 
 ;; Set access
 (defun clear (set)

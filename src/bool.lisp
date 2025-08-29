@@ -19,15 +19,15 @@
     (error 'py.exc:generic-error)))
 
 (clpy.smart:new-hook #'(lambda (x)
-			 (or (eq x :true)
-			     (eq x :false)))
-		     #'(lambda (x)
-			 (if (eq x :true)
-			     (new t)
-			     (new nil))))
+                         (or (eq x :true)
+                             (eq x :false)))
+                     #'(lambda (x)
+                         (if (eq x :true)
+                             (new t)
+                             (new nil))))
 
 (clpy.smart:print-hook #'p
-		       #'(lambda (x)
-			   (if (clpy.object:true-p x t)
-			       "TRUE"
-			       "FALSE")))
+                       #'(lambda (x)
+                           (if (clpy.object:true-p x t)
+                               "TRUE"
+                               "FALSE")))

@@ -3,48 +3,48 @@
   (:use :cl :plus-c)
   (:shadow #:print #:warn #:set)
   (:export #:occurred
-	   #:print
-	   #:clear
-	   #:write-unraisable
+           #:print
+           #:clear
+           #:write-unraisable
 
-	   #:set
-	   #:set-from-errno
-	   #:set-import-error
+           #:set
+           #:set-from-errno
+           #:set-import-error
 
-	   #:warn
-	   #:fetch
-	   #:restore
-	   #:exception-matches
-	   #:set-handled-exception
-	   #:get-handled-exception
+           #:warn
+           #:fetch
+           #:restore
+           #:exception-matches
+           #:set-handled-exception
+           #:get-handled-exception
 
-	   #:check-signals
-	   #:set-interrupt))
+           #:check-signals
+           #:set-interrupt))
 
 (defpackage :clpy.exception
   (:nicknames :py.exc)
   (:use :cl)
   (:shadow #:type #:get)
   (:export #:return-or-raise-python-error
-	   #:raise-generic-or-python-error
-	   #:define-exceptoin
-	   #:generic-error
-	   #:python-error
-	   #:type
-	   #:value
-	   #:*assoc-excs*
-	   #:from
-	   #:get
+           #:raise-generic-or-python-error
+           #:define-exceptoin
+           #:generic-error
+           #:python-error
+           #:type
+           #:value
+           #:*assoc-excs*
+           #:from
+           #:get
 
-	   #:name
-	   #:new-exception
+           #:name
+           #:new-exception
 
-	   #:get-traceback
-	   #:set-traceback
-	   #:get-context
-	   #:set-context
-	   #:get-cause
-	   #:set-cause))
+           #:get-traceback
+           #:set-traceback
+           #:get-context
+           #:set-context
+           #:get-cause
+           #:set-cause))
 
 (in-package :clpy.exception)
 
@@ -86,8 +86,8 @@ If :cl:function:`error-occurred` is ``T``, this function will raise
 an error; otherwise, ``V`` is return."
   (let ((exc (clpy.error:occurred)))
     (if (cffi:null-pointer-p (autowrap:ptr exc))
-	(cl:error 'python-error :type (from exc))
-	v)))
+        (cl:error 'python-error :type (from exc))
+        v)))
 
 
 (defun raise-generic-or-python-error (&key message)
@@ -97,27 +97,27 @@ If :cl:function:`error-occurred` return NULL, a GENERIC-ERROR will be
 raised; Otherwise, a Python error will be raised."
   (let ((exc (clpy.error:occurred)))
     (if exc
-	(error 'python-error :type exc :message message)
-	(error 'generic-error :message message))))
+        (error 'python-error :type exc :message message)
+        (error 'generic-error :message message))))
 
 
 (define-condition generic-error (error)
   ((message :initarg :message
-	    :initform nil
-	    :reader message))
+            :initform nil
+            :reader message))
   (:report (lambda (condition stream)
-	     (format stream "GENERIC-ERROR: ~A" (message condition)))))
+             (format stream "GENERIC-ERROR: ~A" (message condition)))))
 
 (define-condition python-error (error)
   ((type :initarg :type
          :initform nil
          :reader type)
-  (value :initarg :message
-	 :initform nil
-	 :reader message))
+   (value :initarg :message
+          :initform nil
+          :reader message))
   (:report (lambda (condition stream)
-	     (format stream "~A: ~A~%" (type condition) (message condition))
-	     (format stream "~A~%" (py.err:print 1 :capture t)))))
+             (format stream "~A: ~A~%" (type condition) (message condition))
+             (format stream "~A~%" (py.err:print 1 :capture t)))))
 
 ;; Exception types
 (defparameter *assoc-excs* '()
@@ -127,8 +127,8 @@ raised; Otherwise, a Python error will be raised."
   "Return the corresponding keyword to the Python exception PY-EXC."
   (when py-exc
     (let ((-py-exc (if (cffi:pointerp py-exc)
-		       py-exc
-		       (autowrap:ptr py-exc))))
+                       py-exc
+                       (autowrap:ptr py-exc))))
       (car (rassoc -py-exc *assoc-excs* :test #'cffi:pointer-eq)))))
 
 (defun get (kw)
@@ -140,8 +140,8 @@ is the reverse of :cl:function:`from`."
 
 (defmacro define-exception (cname name)
   (let* ((name-str (symbol-name name))
-	 (const-sym (intern (format nil "+~A+" name-str)))
-	 (kw-sym (intern name-str :keyword)))
+         (const-sym (intern (format nil "+~A+" name-str)))
+         (kw-sym (intern name-str :keyword)))
     `(progn
        (cffi:defcvar (,cname ,const-sym :read-only t) :pointer)
        (push (cons ,kw-sym ,const-sym) *assoc-excs*))))
@@ -246,8 +246,8 @@ descriptoin for the exception class."
 
 Use NIL to clear it."
   (clpy.util:let ((tb (if tb
-			  (clpy.object:new-ref tb)
-			  (clpy.object:none))))
+                          (clpy.object:new-ref tb)
+                          (clpy.object:none))))
     (clpy.ffi.fns:py-exception-set-traceback ex tb)))
 
 (defun get-context (ex)

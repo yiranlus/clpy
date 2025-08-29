@@ -3,39 +3,39 @@
   (:use :cl)
   (:shadow #:format #:type #:not)
   (:export #:+GENERIC-GET-ATTR+
-	   #:+GENERIC-SET-ATTR+
-	   #:+GENERIC-GET-DICT+
-	   #:+GENERIC-SET-DICT+
-	   #:p
-	   #:ob-refcnt
-	   #:ob-type
-	   #:ob-base
-	   #:ob-size
-	   #:new-ref
-	   #:new-xref
+           #:+GENERIC-SET-ATTR+
+           #:+GENERIC-GET-DICT+
+           #:+GENERIC-SET-DICT+
+           #:p
+           #:ob-refcnt
+           #:ob-type
+           #:ob-base
+           #:ob-size
+           #:new-ref
+           #:new-xref
            #:inc-ref
-	   #:inc-xref
+           #:inc-xref
            #:dec-ref
-	   #:dec-xref
+           #:dec-xref
 
-	   #:init
-	   #:init-var
+           #:init
+           #:init-var
 
-	   ;; constant
-	   #:+NONE+
-	   #:none
-	   #:+NOT-IMPLEMENTED+
-	   #:not-implemented
+           ;; constant
+           #:+NONE+
+           #:none
+           #:+NOT-IMPLEMENTED+
+           #:not-implemented
 
-	   ;; attr
-	   #:has-attr
+           ;; attr
+           #:has-attr
            #:get-attr
            #:set-attr
            #:get-dict
            #:set-dict
-	   #:get-item
-	   #:set-item
-	   #:del-item
+           #:get-item
+           #:set-item
+           #:del-item
            #:dir
 
            ;; query
@@ -50,8 +50,9 @@
            #:hash
            #:hash-not-implemented
            #:true-p
-	   #:false-p
-	   #:none-p
+           #:false-p
+           #:none-p
+           #:is ;; utility function to minic Python's is operator
            #:not
            #:type
 
@@ -63,18 +64,18 @@
            ;;#:get-iter
            ;;#:get-a-iter
 
-	   ;; function calling
+           ;; function calling
            #:callable-p
            #:call
 
-	   #:self-iter
-	   #:get-iter
-	   #:get-a-iter
+           #:self-iter
+           #:get-iter
+           #:get-a-iter
 
-	   #:as-fd
+           #:as-fd
 
-	   #:clear-weakrefs
-	   #:malloc
-	   #:calloc
-	   #:realloc
-	   #:free))
+           #:clear-weakrefs
+           #:malloc
+           #:calloc
+           #:realloc
+           #:free))

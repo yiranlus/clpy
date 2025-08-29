@@ -10,7 +10,7 @@
 (defconstant +GENERIC-SET-DICT+
   (cffi:foreign-symbol-pointer "PyObject_GenericSetDict"))
 
-;; Init
+;; Initx
 
 (defun init (o type)
   (clpy.ffi.fns:py-object-init o type))
@@ -64,21 +64,24 @@ allocate memory for the dictionary, it may be more efficient to call
 (defun get-item (o key)
   "Return element of o corresponding to the object KEY."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-object-get-item o key)
+      (clpy.util:let ((-key (clpy.smart:new key)))
+        (clpy.ffi.fns:py-object-get-item o -key))
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun set-item (o key v)
   "Map the object key to the value."
   (clpy.util:ensure-non-negative
-      (clpy.ffi.fns:py-object-set-item o key v)
+      (clpy.util:let ((-key (clpy.smart:new key))
+                      (-v (clpy.smart:new v)))
+        (clpy.ffi.fns:py-object-set-item o -key v))
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun del-item (o key)
   "Return element of o corresponding to the object KEY."
   (clpy.util:ensure-null-as-nil
       (if (stringp key)
-	  (clpy.ffi.fns:py-object-del-item-string o key)
-	  (clpy.ffi.fns:py-object-del-item o key))
+          (clpy.ffi.fns:py-object-del-item-string o key)
+          (clpy.ffi.fns:py-object-del-item o key))
     (clpy.exception:raise-generic-or-python-error)))
 
 
@@ -119,9 +122,9 @@ Return ``T`` if the object ``O`` is considered to be true. If EXACT-P
 is ``T``, then this is equivalent to ``o is True``."
   (plusp
    (clpy.util:ensure-non-negative
-    (if exact
-	(clpy.ffi.fns:py-is-true o)
-        (clpy.ffi.fns:py-object-is-true o))
+       (if exact
+           (clpy.ffi.fns:py-is-true o)
+           (clpy.ffi.fns:py-object-is-true o))
      (clpy.exception:raise-generic-or-python-error))))
 
 
@@ -138,6 +141,17 @@ This is equivalent to ``o is None`` in Python."
 This is equivalent to ``o is False`` in Python."
   (plusp (clpy.ffi.fns:py-is-false o)))
 
+(defun is (o1 o2)
+  "Utility function to minic Python's ``is`` operator.
+
+O1 should be an PyObject. O2 can be another PyObject, :NONE, :TRUE or :FALSE."
+  (case o2
+    (:none (none-p o1))
+    (:true (true-p o1 :exact t))
+    (:false (false-p o2))
+    (otherwise (cffi:pointer-eq (autowrap:ptr o1)
+                                (autowrap:ptr o2)))))
+
 
 (defun not (o)
   "Return NIL if the object ``O`` is considered to be true, otherwise ``T``"
@@ -152,20 +166,20 @@ This is equivalent to ``o is False`` in Python."
 The return value can be ``T``, NIL, or Py_NotImplemented. Possible
 values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
   (let ((py-op (case op
-		 (:GT clpy.type:+PY-GT+)
-		 (:GE clpy.type:+PY-GE+)
-		 (:EQ clpy.type:+PY-EQ+)
-		 (:NE clpy.type:+PY-NE+)
-		 (:LT clpy.type:+PY-LT+)
-		 (:LE clpy.type:+PY-LE+))))
+                 (:GT clpy.type:+PY-GT+)
+                 (:GE clpy.type:+PY-GE+)
+                 (:EQ clpy.type:+PY-EQ+)
+                 (:NE clpy.type:+PY-NE+)
+                 (:LT clpy.type:+PY-LT+)
+                 (:LE clpy.type:+PY-LE+))))
 
     (if as-object
-	(clpy.util:ensure-null-as-nil
-	    (clpy.ffi.fns:py-object-rich-compare left right py-op)
-	  (clpy.exception:raise-generic-or-python-error))
-	(clpy.util:ensure-non-negative
-	    (clpy.ffi.fns:py-object-rich-compare-bool left right py-op)
-	  (clpy.exception:raise-generic-or-python-error)))))
+        (clpy.util:ensure-null-as-nil
+            (clpy.ffi.fns:py-object-rich-compare left right py-op)
+          (clpy.exception:raise-generic-or-python-error))
+        (clpy.util:ensure-non-negative
+            (clpy.ffi.fns:py-object-rich-compare-bool left right py-op)
+          (clpy.exception:raise-generic-or-python-error)))))
 
 (defun len (o)
   (clpy.util:ensure-non-negative
@@ -182,8 +196,8 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
   "Compute a string representation of the object. This generates a string similar to that returned by ``repr()''"
   (clpy.util:ensure-null-as-nil
       (clpy.util:let ((-format-spec (clpy.str:new format-spec)))
-	(clpy.ffi.fns:py-object-format o -format-spec)
-    (clpy.exception:raise-generic-or-python-error))))
+        (clpy.ffi.fns:py-object-format o -format-spec)
+        (clpy.exception:raise-generic-or-python-error))))
 
 (defun repr (o &key only-ascii)
   "Compute a string representation of the object. This generates a string similar to that returned by ``repr()''"
@@ -218,14 +232,14 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-object-hash-not-implemented o)
     (clpy.exception:raise-generic-or-python-error)))
-  
+
 ;; Iterators
 
 (defun self-iter (o)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-self-iter o)
     (clpy.exception:raise-generic-or-python-error)))
-  
+
 
 (defun get-iter (o)
   (clpy.util:ensure-null-as-nil

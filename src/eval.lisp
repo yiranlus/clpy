@@ -3,21 +3,21 @@
   (:use :cl)
   (:shadow #:compile #:eval)
   (:export #:compile
-	   #:eval
+           #:eval
 
-	   #:get-builtins
-	   #:get-locals
-	   #:get-globals
-	   #:get-frame
-	   #:get-func-name
-	   #:get-func-desc
+           #:get-builtins
+           #:get-locals
+           #:get-globals
+           #:get-frame
+           #:get-func-name
+           #:get-func-desc
 
-	   #:release-thread
-	   #:acquire-thread
-	   #:save-thread
-	   #:restore-thread
+           #:release-thread
+           #:acquire-thread
+           #:save-thread
+           #:restore-thread
 
-	   #:allow-threads))
+           #:allow-threads))
 
 (in-package :clpy.eval)
 
@@ -27,19 +27,19 @@
 FILENAME can be NIL; in this case, a temporary filename will be given."
   (clpy.util:ensure-null-as-nil
       (let ((-start (case start
-		      (:single 256) ; #define Py_single_input 256
-		      (:file 257)   ; #define Py_file_input 257
-		      (:eval 258)   ; #define Py_eval_input 258
-		      )))
-	(clpy.ffi.fns:py-compile-string code filename -start))
+                      (:single 256) ; #define Py_single_input 256
+                      (:file 257)   ; #define Py_file_input 257
+                      (:eval 258)   ; #define Py_eval_input 258
+                      )))
+        (clpy.ffi.fns:py-compile-string code filename -start))
     (clpy.exception:raise-generic-or-python-error
      :message "Unable to compile the code")))
 
 
 (defun eval (code &key
-		    (globals nil globals-p) (locals nil locals-p) ; for PyEval_EvalCode
-		    args argcount kws kwcount defs defcount kwdefs closure ; for PyEval_EvalCodeEx
-		    throwflag)
+                    (globals nil globals-p) (locals nil locals-p) ; for PyEval_EvalCode
+                    args argcount kws kwcount defs defcount kwdefs closure ; for PyEval_EvalCodeEx
+                    throwflag)
   "Eval a code.
 
 ARGS should be an C-array of Python object and the size is indicated by
@@ -51,30 +51,30 @@ the default values for keyword arguments. CLOSURE is a tuple of
 PyCellObject."
   (clpy.util:ensure-null-as-nil
       (if (clpy.frame:p code)
-	  (if throwflag
-	      (clpy.ffi.fns:py-eval-eval-frame-ex code throwflag)
-	      (clpy.ffi.fns:py-eval-eval-frame code))
-	  (clpy.util:let ((-globals (if globals-p
-					(clpy.object:new-ref globals)
-					(clpy.dict:new)))
-			  (-locals (if locals-p
-				       (clpy.object:new-ref locals)
-				       (clpy.dict:new))))
-	    (unless globals-p
-	      (clpy.dict:set-item -globals "__builtins__" (get-builtins)))
-	    (clpy.util:let ((-code (if (stringp code)
-				       (compile code)
-				       (clpy.object:new-ref code))))
-	      (if (or args kws defs kwdefs closure)
-		  (clpy.ffi.fns:py-eval-eval-code-ex -code -globals -locals
-						     args (or argcount 0)
-						     kws (or kwcount 0)
-						     defs (or defcount 0)
-						     kwdefs
-						     closure)
-		(clpy.ffi.fns:py-eval-eval-code -code -globals -locals)))))
-	  (clpy.exception:raise-generic-or-python-error
-	   :message (format nil "Unable to eval the code"))))
+          (if throwflag
+              (clpy.ffi.fns:py-eval-eval-frame-ex code throwflag)
+              (clpy.ffi.fns:py-eval-eval-frame code))
+          (clpy.util:let ((-globals (if globals-p
+                                        (clpy.object:new-ref globals)
+                                        (clpy.dict:new)))
+                          (-locals (if locals-p
+                                       (clpy.object:new-ref locals)
+                                       (clpy.dict:new))))
+            (unless globals-p
+              (clpy.dict:set-item -globals "__builtins__" (get-builtins)))
+            (clpy.util:let ((-code (if (stringp code)
+                                       (compile code)
+                                       (clpy.object:new-ref code))))
+              (if (or args kws defs kwdefs closure)
+                  (clpy.ffi.fns:py-eval-eval-code-ex -code -globals -locals
+                                                     args (or argcount 0)
+                                                     kws (or kwcount 0)
+                                                     defs (or defcount 0)
+                                                     kwdefs
+                                                     closure)
+                  (clpy.ffi.fns:py-eval-eval-code -code -globals -locals)))))
+    (clpy.exception:raise-generic-or-python-error
+     :message (format nil "Unable to eval the code"))))
 
 (defun get-builtins ()
   (clpy.ffi.fns:py-eval-get-builtins))
@@ -125,9 +125,9 @@ which is a higher-level function."
   (let ((saved-state (gensym)))
     `(progn
        (let ((,saved-state (save-thread)))
-	 (flet ((block-threads ()
-		  (restore-thread ,saved-state))
-		(unblock-threads ()
-		  (setf ,saved-state (save-thread))))
-	   ,@body
-	   (restore-thread ,saved-state))))))
+         (flet ((block-threads ()
+                  (restore-thread ,saved-state))
+                (unblock-threads ()
+                  (setf ,saved-state (save-thread))))
+           ,@body
+           (restore-thread ,saved-state))))))
