@@ -85,42 +85,42 @@
   (when (cl:and method-p (not (assoc method *py-long-from-binding-list*)))
     (error (format nil "Method ~A is not supported." method)))
   (clpy.util:ensure-null-as-nil
-      (cond
-        ((assoc method *py-long-from-binding-list*)
-         (funcall (assoc method *py-long-from-binding-list*) value))
-        ((stringp value)
-         (clpy.ffi.fns:py-long-from-string value nil base))
-        ((floatp value) (clpy.ffi.fns:py-long-from-double value))
-        ((integerp value)
-         (let ((nbits (when (integerp value) (1+ (integer-length value)))))
-           (cond
-             ((<= nbits 32) (clpy.ffi.fns:py-long-from-long value))
-             ((<= nbits 64) (clpy.ffi.fns:py-long-from-long-long value))))))))
+   (cond
+     ((assoc method *py-long-from-binding-list*)
+      (funcall (assoc method *py-long-from-binding-list*) value))
+     ((stringp value)
+      (clpy.ffi.fns:py-long-from-string value nil base))
+     ((floatp value) (clpy.ffi.fns:py-long-from-double value))
+     ((integerp value)
+      (let ((nbits (when (integerp value) (1+ (integer-length value)))))
+        (cond
+          ((<= nbits 32) (clpy.ffi.fns:py-long-from-long value))
+          ((<= nbits 64) (clpy.ffi.fns:py-long-from-long-long value))))))))
 
 (defun new (n &optional (type nil type-p))
   (clpy.util:ensure-null-as-nil
+   (cond
+     ((stringp n)
+      (if (not type-p)
+          (error "TYPE must be specified when N is a string.")
+          (case type
+            (:float (clpy.ffi.fns:py-float-from-string n))
+            (:long (clpy.ffi.fns:py-long-from-string n))
+            (:complex (error "String of complex number is not supported."))
+            (otherwise (error (format nil "TYPE ~A is not found." type))))))
+     ((not type-p)
       (cond
-        ((stringp n)
-         (if (not type-p)
-             (error "TYPE must be specified when N is a string.")
-             (case type
-               (:float (clpy.ffi.fns:py-float-from-string n))
-               (:long (clpy.ffi.fns:py-long-from-string n))
-               (:complex (error "String of complex number is not supported."))
-               (otherwise (error (format nil "TYPE ~A is not found." type))))))
-        ((not type-p)
-         (cond
-           ((complexp n) (clpy.ffi.fns:py-complex-from-doubles (coerce (realpart n) 'double-float)
-                                                               (coerce (imagpart n) 'double-float)))
-           ((floatp n) (clpy.ffi.fns:py-float-from-double (coerce n 'double-float)))
-           ((integerp n) (new-long n))
-           (t (error (format nil "non-supported type for ~A." n)))))
-        (type-p
-         (case type
-           (:float (clpy.ffi.fns:py-float-from-double n))
-           (:complex (clpy.ffi.fns:py-complex-from-doubles (realpart n) (imagpart n)))
-           (otherwise (new-long n :method type)))))
-    (clpy.exception:raise-generic-or-python-error :message (format nil "Unable to create PyObject for ~A." n))))
+        ((complexp n) (clpy.ffi.fns:py-complex-from-doubles (coerce (realpart n) 'double-float)
+                                                            (coerce (imagpart n) 'double-float)))
+        ((floatp n) (clpy.ffi.fns:py-float-from-double (coerce n 'double-float)))
+        ((integerp n) (new-long n))
+        (t (error (format nil "non-supported type for ~A." n)))))
+     (type-p
+      (case type
+        (:float (clpy.ffi.fns:py-float-from-double n))
+        (:complex (clpy.ffi.fns:py-complex-from-doubles (realpart n) (imagpart n)))
+        (otherwise (new-long n :method type)))))
+   (clpy.exception:raise-generic-or-python-error :message (format nil "Unable to create PyObject for ~A." n))))
 
 (defun as-double (number)
   (case (py.obj:ob-type number)
@@ -169,187 +169,187 @@
 
 (defun int (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-long number)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-long number)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun float (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-float number)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-float number)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun index (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-index number)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-index number)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun to-base (number base)
   "Return the integer ``number`` converted to base base as a string."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-to-base number base)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-to-base number base)
+   (clpy.exception:raise-generic-or-python-error)))
 
 ;; operations
 
 (defun + (o1 &optional (o2 nil))
   (clpy.util:ensure-null-as-nil
-      (if o2
-          (clpy.ffi.fns:py-number-add o1 o2)
-          (clpy.ffi.fns:py-number-positive o1))
-    (clpy.exception:raise-generic-or-python-error)))
+   (if o2
+       (clpy.ffi.fns:py-number-add o1 o2)
+       (clpy.ffi.fns:py-number-positive o1))
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun - (o1 &optional (o2 nil))
   (clpy.util:ensure-null-as-nil
-      (if o2
-          (clpy.ffi.fns:py-number-subtract o1 o2)
-          (clpy.ffi.fns:py-number-negative o1))
-    (clpy.exception:raise-generic-or-python-error)))
+   (if o2
+       (clpy.ffi.fns:py-number-subtract o1 o2)
+       (clpy.ffi.fns:py-number-negative o1))
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun * (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-multiply o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-multiply o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun @ (o1 o2)
     (clpy.util:ensure-null-as-nil
-        (clpy.ffi.fns:py-number-matrix-multiply o1 o2)
-      (clpy.exception:raise-generic-or-python-error)))
+     (clpy.ffi.fns:py-number-matrix-multiply o1 o2)
+     (clpy.exception:raise-generic-or-python-error)))
 
 (defun // (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-floor-divide o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-floor-divide o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun / (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-true-divide o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-true-divide o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun % (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-remainder o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-remainder o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun divmod (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-divmod o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-divmod o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun ** (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.util:let ((none (clpy.object:none)))
-        (clpy.ffi.fns:py-number-power o1 o2 none))
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.util:let ((none (clpy.object:none)))
+     (clpy.ffi.fns:py-number-power o1 o2 none))
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun **% (o1 o2 o3)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-power o1 o2 o3)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-power o1 o2 o3)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun ~ (o1)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-invert o1)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-invert o1)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun << (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-lshift o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-lshift o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun >> (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-rshift o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-rshift o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun and (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-and o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-and o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun xor (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-xor o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-xor o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun or (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-or o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-or o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 ;; in-place operation
 
 (defun += (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-add o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-add o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun -= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-subtract o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-subtract o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun *= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-multiply o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-multiply o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun @= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-matrix-multiply o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-matrix-multiply o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun //= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-floor-divide o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-floor-divide o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun /= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-true-divide o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-true-divide o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun %= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-remainder o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-remainder o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun **= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.util:let ((none (clpy.object:none)))
-        (clpy.ffi.fns:py-number-in-place-power o1 o2 none))
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.util:let ((none (clpy.object:none)))
+     (clpy.ffi.fns:py-number-in-place-power o1 o2 none))
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun **%= (o1 o2 o3)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-power o1 o2 o3)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-power o1 o2 o3)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun <<= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-lshift o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-lshift o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun >>= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-rshift o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-rshift o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun and= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-and o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-and o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun xor= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-xor o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-xor o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun or= (o1 o2)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-in-place-or o1 o2)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-in-place-or o1 o2)
+   (clpy.exception:raise-generic-or-python-error)))
 
 ;; util functions
 (defun abs (number)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-number-absolute number)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-number-absolute number)
+   (clpy.exception:raise-generic-or-python-error)))

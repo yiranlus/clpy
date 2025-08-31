@@ -50,7 +50,7 @@ cl_custom_command = ["qlot", "exec", "ros", "-Q", "--", cldomain_exe]
 #cl_quicklisp = join(dirname(realpath(__file__)), "../.qlot/quicklisp"),
 highlight_language = "common-lisp"
 
-cl_debug = True
+cl_debug = False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

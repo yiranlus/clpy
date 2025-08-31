@@ -31,15 +31,12 @@
   (clpy.ffi.acc:py-buffer.buf buf))
 
 
-
 (defun buffer-obj (buf)
   (clpy.ffi.acc:py-buffer.obj buf))
 
 
-
 (defun buffer-len (buf)
   (clpy.ffi.acc:py-buffer.len buf))
-
 
 
 (defun buffer-readonly (buf)
@@ -47,15 +44,12 @@
    (clpy.ffi.acc:py-buffer.readonly buf)))
 
 
-
 (defun buffer-itemsize (buf)
   (clpy.ffi.acc:py-buffer.itemsize buf))
 
 
-
 (defun buffer-format (buf)
   (clpy.ffi.acc:py-buffer.format buf))
-
 
 
 (defun buffer-ndim (buf)
@@ -131,7 +125,7 @@
 An optional FLAGS can be provide. Unlike PyObject_GetBuffer, you will get the
 Py_buffer pointer as a return function.
 
-You should use :cl:functoin:`release` to release the reference to the current
+You should use :cl:functoin:``release`` to release the reference to the current
 view and use ``autowrap:free`` to free the allocated Py_Buffer object."
   (c-let ((view clpy.ffi:py-buffer))
     (clpy.util:ensure-zero

@@ -4,7 +4,7 @@
   "Test whether the error indicator is set.
 
 If set, return the exception TYPE. You not own a reference to the
-return value, so you do not need to :cl:function:`py:dec-ref` it."
+return value, so you do not need to :cl:function:``py:dec-ref`` it."
   (clpy.exception:from (clpy.util:ensure-null-as-nil
                         (clpy.ffi.fns:py-err-occurred))))
 
@@ -73,7 +73,7 @@ returned an error and set the C variable errno."
 
 
 (defun set-import-error (msg &key name path subclass)
-  "Convenience function to raise ``ImportError''"
+  "Convenience function to raise ``ImportError``"
   (if subclass
       (clpy.ffi.fns:py-err-set-import-error-subclass subclass msg name path)
       (clpy.ffi.fns:py-err-set-import-error msg name path)))

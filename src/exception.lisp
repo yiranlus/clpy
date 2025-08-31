@@ -135,7 +135,7 @@ raised; Otherwise, a Python error will be raised."
   "Return the corresponding Python exception to the keyword KW.
 
 For example, (GET :IO-ERROR) will return `PyExc_IOError`. This function
-is the reverse of :cl:function:`from`."
+is the reverse of :cl:function:`clpy.exception:from`."
   (cdr (assoc kw *assoc-excs*)))
 
 (defmacro define-exception (cname name)

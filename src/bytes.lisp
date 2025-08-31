@@ -58,7 +58,7 @@
 (defun repr (bytes i)
   "Compute a string representation of ``O``.
 
-This generates a string similar to that returned by ``repr()''"
+This generates a string similar to that returned by ``repr()``."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-bytes-repr bytes i)
     (clpy.exception:raise-generic-or-python-error)))

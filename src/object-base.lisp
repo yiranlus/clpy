@@ -1,7 +1,7 @@
 (in-package :clpy.object)
 
 (defun p (o)
-  "Check if `O` is a PyObject."
+  "Check if ``O`` is a PyObject."
   (typep o 'clpy.ffi:py-object))
 
 (defun var-p (o)
@@ -29,32 +29,32 @@
   (clpy.ffi.acc:py-var-object.ob-size vobj))
 
 (defun new-ref (o)
-  "Create a strong reference to `O` and return it."
+  "Create a strong reference to ``O`` and return it."
   (clpy.util:ensure-null-as-nil
    (clpy.ffi.fns:py-new-ref o)))
 
 (clpy.smart:new-hook #'p #'new-ref)
 
 (defun inc-ref (o)
-  "Indicate taking a new strong reference to `O`."
+  "Indicate taking a new strong reference to ``O``."
   (clpy.ffi.fns:py-inc-ref o))
 
 (defun dec-ref (o)
-  "Release a strong reference to object O."
+  "Release a strong reference to object ``O``."
   (clpy.ffi.fns:py-dec-ref o))
 
 ;; X versions
 
 (defun new-xref (o)
-  "Similar to :cl:function:`new-ref`, but the object `O` can be NULL.
+  "Similar to :cl:function:`clpy.object:new-ref`, but the object ``O`` can be NULL.
 
-This is equivalent to Python's `Py_XNewRef`."
+This is equivalent to Python's ``Py_XNewRef``."
   (unless (or (null o)
               (cffi:null-pointer-p (autowrap:ptr o)))
     (new-ref o)))
 
 (defun inc-xref (o)
-  "Similar to :cl:function:`inc-ref`, but the object `O` can be NULL.
+  "Similar to :cl:function:`inc-ref`, but the object ``O`` can be NULL.
 
 This equivalent to Python's `Py_XINCREF."
   (unless (or (null o)
@@ -62,7 +62,7 @@ This equivalent to Python's `Py_XINCREF."
     (inc-ref o)))
 
 (defun dec-xref (o)
-  "Similar to :cl:function:`dec-ref`, but the object `O` can be NULL.
+  "Similar to :cl:function:`dec-ref`, but the object ``O`` can be NULL.
 
 This equivalent to Python's `Py_XDECCREF."
   (unless (or (null o)

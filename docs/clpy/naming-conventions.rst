@@ -4,7 +4,7 @@ Naming Conventions
 
 The methods are organized different packages by generally their namer. For
 example, methods starting with ``PyObject_`` is stored in package
-:cl:package:`clpy.object`. The following table shows what methods are stored
+`clpy.object <references/clpy/clpy.object>`. The following table shows what methods are stored
 in corresponding packages
 
 +-----------------------+----------------------+-----------------+

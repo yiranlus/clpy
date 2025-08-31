@@ -50,7 +50,7 @@
 
 It creates the dictionary if necessary. This function may need to
 allocate memory for the dictionary, it may be more efficient to call
-:cl:function:`get-attr` when accessing an attribute on the object."
+:cl:function:`clpy.object:get-attr` when accessing an attribute on the object."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-generic-get-dict o context)
     (clpy.exception:raise-generic-or-python-error)))
@@ -101,7 +101,7 @@ allocate memory for the dictionary, it may be more efficient to call
 (defun is-instance (o cls)
   "Return ``T`` if the class derived is identical to or derived from
 the class CLS, otherwise return 0. CLS can be keyword registered in
-CLPY.TYPE:*ASSOC-TYPES*."
+``CLPY.TYPE:*ASSOC-TYPES*``."
   (let ((-cls (if (keywordp cls) (py.type:get cls) cls)))
     (case (clpy.ffi.fns:py-object-is-instance o -cls)
       (1 t)
@@ -118,8 +118,8 @@ This is equivalent to ``o1 is o2`` in Python."
 (defun true-p (o &key (exact nil))
   "Test if ``O`` is True.
 
-Return ``T`` if the object ``O`` is considered to be true. If EXACT-P
-is ``T``, then this is equivalent to ``o is True``."
+Return ``T`` if the object ``O`` is considered to be true. If EXACT-P is ``T``,
+then this is equivalent to ``o is True``."
   (plusp
    (clpy.util:ensure-non-negative
        (if exact
@@ -154,7 +154,7 @@ O1 should be an PyObject. O2 can be another PyObject, :NONE, :TRUE or :FALSE."
 
 
 (defun not (o)
-  "Return NIL if the object ``O`` is considered to be true, otherwise ``T``"
+  "Return NIL if the object ``O`` is considered to be true, otherwise ``T``."
   (plusp
    (clpy.util:ensure-non-negative
        (clpy.ffi.fns:py-object-not o)
@@ -193,32 +193,37 @@ values for OP are :GT, :GE, :EQ, :NE, :LT, :LE."
 ;; Representations
 
 (defun format (o format-spec)
-  "Compute a string representation of the object. This generates a string similar to that returned by ``repr()''"
+  "Compute a string representation of the object. This generates a string
+similar to that returned by ``repr()``."
   (clpy.util:ensure-null-as-nil
       (clpy.util:let ((-format-spec (clpy.str:new format-spec)))
         (clpy.ffi.fns:py-object-format o -format-spec)
         (clpy.exception:raise-generic-or-python-error))))
 
 (defun repr (o &key only-ascii)
-  "Compute a string representation of the object. This generates a string similar to that returned by ``repr()''"
+  "Compute a string representation of the object. This generates a string
+similar to that returned by ``repr()``."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-repr o)
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun ascii (o)
-  "Compute a string representation of the object. This generates a string similar to that returned by ``ascii()''"
+  "Compute a string representation of the object. This generates a string
+similar to that returned by ``ascii()``."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-ascii o)
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun str (o)
-  "Compute a string representation of the object. This is the equivalent of the Python expresssion ``str(o)''. Return nil when fails."
+  "Compute a string representation of the object. This is the equivalent of the
+Python expresssion ``str(o)``. Return nil when fails."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-str o)
     (clpy.exception:raise-generic-or-python-error)))
 
 (defun bytes (o)
-  "Compute a bytesing representation of the object. This is the equivalent of the Python expresssion ``bytes(o)''. Return nil when fails."
+  "Compute a bytesing representation of the object. This is the equivalent of
+the Python expresssion ``bytes(o)``. Return nil when fails."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-object-bytes o)
     (clpy.exception:raise-generic-or-python-error)))

@@ -44,7 +44,7 @@ first predictor that return ``T``."
   (push (cons pred print-func) *print-mapping*))
 
 (defun print (x &optional (stream *standard-output*))
-  "Similar to :cl:function:`new`, but used for print the object."
+  "Similar to :cl:function:`clpy.smart:new`, but used for print the object."
   (loop for (pred . print-func) in *print-mapping*
         when (funcall pred x)
           do (return-from print

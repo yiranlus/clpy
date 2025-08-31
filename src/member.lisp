@@ -13,13 +13,13 @@
 
 The function signature is
 
-.. code-block:: c
+.. code:: c
 
-   PyObject *getter(PyObject *self, void *closure)``.
+   PyObject *getter(PyObject *self, void *closure)
 
 It is recommended to use fixed name for the arguments, for example
 
-.. code-block:: common-lisp
+.. code:: common-lisp
 
    (defcfunction my-getter (self closure)
      (print 'do-some-thing))"
@@ -35,13 +35,13 @@ It is recommended to use fixed name for the arguments, for example
 
 The function signature is
 
-.. code-block:: c
+.. code:: c
 
-   PyObject *getter(PyObject *self, PyObject *value, void *closure)``.
+   PyObject *getter(PyObject *self, PyObject *value, void *closure)
 
 It is recommended to use fixed name for the arguments, for example
 
-.. code-block:: common-lisp
+.. code:: common-lisp
 
    (defcfunction my-setter (self value closure)
      (print 'do-some-thing))"
