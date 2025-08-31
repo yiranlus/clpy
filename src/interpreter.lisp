@@ -2,10 +2,10 @@
   (:nicknames :py.inter)
   (:use :cl :plus-c)
   (:export #:initialize
-	   #:is-initialized
-	   #:finalize
-	   ;; runtime
-	   #:encode-locale
+           #:is-initialized
+           #:finalize
+           ;; runtime
+           #:encode-locale
            #:decode-locale
            #:set-program-name
            #:get-program-name
@@ -20,30 +20,30 @@
            #:get-build-info
            #:set-python-home
            #:get-python-home
-	   #:get-recursion-limit
+           #:get-recursion-limit
 
-	   #:enter-recursive-call
-	   #:leave-recursive-call
-	   #:repr-enter
-	   #:repr-leave
+           #:enter-recursive-call
+           #:leave-recursive-call
+           #:repr-enter
+           #:repr-leave
 
-	   #:state-new
-	   #:state-get
-	   #:state-get-id
-	   #:state-get-dict
-	   #:state-clear
-	   #:state-delete
+           #:state-new
+           #:state-get
+           #:state-get-id
+           #:state-get-dict
+           #:state-clear
+           #:state-delete
 
-	   #:fatal-error
-	   #:main
-	   #:exit
-	   #:at-exit
+           #:fatal-error
+           #:main
+           #:exit
+           #:at-exit
 
-	   #:new-interpreter
-	   #:end-interpreter
+           #:new-interpreter
+           #:end-interpreter
 
-	   #:add-pending-call
-	   #:make-panding-calls))
+           #:add-pending-call
+           #:make-panding-calls))
 
 (in-package :clpy.interpreter)
 
@@ -77,7 +77,7 @@ otherwise NIL."
         (clpy.ffi.fns:py-encode-locale text (error-pos &))
       (unless (cffi:null-pointer-p ptr)
         (clpy.ffi.fns:py-mem-free ptr))
-        res)))
+      res)))
 
 (defun decode-locale (arg)
   "Reverse of :cl:function:`encode-locale`"
@@ -218,7 +218,7 @@ The function should be a void function without argument."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-new-interpreter)
     (error 'clpy.exception:generic-error
-	   :message "Failed to create a sub-interpreter.")))
+           :message "Failed to create a sub-interpreter.")))
 
 (defun end-interpreter (tstate)
   "Destroy the (sub-)interpreter reprensted by the given thread state."

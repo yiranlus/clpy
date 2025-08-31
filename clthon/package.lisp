@@ -12,6 +12,7 @@
 (defparameter *object-hash-registry* (make-hash-table))
 
 (defun free-registry ()
+  "Free the created PyObjects."
   (dolist (object *object-registry*)
     (py:dec-xref (cdr object)))
   (setf *object-registry* '())
@@ -47,6 +48,7 @@
         obj)))
 
 (defmacro from (module &optional import-key attrs)
+  "Import anything from the module."
   (multiple-value-bind (name alias)
       (if (listp module)
           (if (eq :as (second module))
@@ -55,7 +57,7 @@
               (error "Syntax not correct, please use :as."))
           (values (symbol-name module)
                   (if import-key
-                      (gensym)
+                      (intern (string-upcase (symbol-name module)))
                       module)))
     (let ((obj (gensym)))
       `(progn
@@ -70,13 +72,17 @@
   (if (and (listp o-name)
            (eq 'quote (first o-name))
            (symbolp (second o-name)))
-      `(gethash ,o-name *object-hash-registry*)
-      o-name))
+      `(py:new-xref (gethash ,o-name *object-hash-registry*))
+      (if (listp o-name)
+          o-name
+          `(py:new-xref ,o-name))))
 
 
 (defmacro call (obj &optional args kwargs)
+  "Call OBJ with positional arguments and keyword arguments."
   (let ((-args (gensym))
-        (-kwargs (gensym)))
+        (-kwargs (gensym))
+        (-called-obj (gensym)))
     `(py:let ((,-args ,(when args
                          `(py.tuple:new ,@args)))
               (,-kwargs ,(when kwargs
@@ -84,9 +90,11 @@
                              ,@(mapcar (lambda (x)
                                          `(cons ,(symbol-name (car x)) ,(cdr x)))
                                        kwargs)))))
-       (py:call (g ,obj) :args ,-args :kwargs ,-kwargs))))
+       (py:let ((,-called-obj (g ,obj)))
+         (py:call ,-called-obj :args ,-args :kwargs ,-kwargs)))))
 
 (defmacro ncall (obj &optional args kwargs)
+  "Like :cl:macro:``call`` but discard the returned value."
   (let ((res (gensym)))
     `(py:let ((,res (call ,obj ,args ,kwargs))))))
 
@@ -100,6 +108,7 @@
            (-@ ,sub-obj ,@(cdr attrs))))))
 
 (defmacro @ (o &rest attrs)
+  "Access the attributes of an object."
   `(-@ (g ,o) ,@attrs))
 
 (define-setf-expander @ (obj &rest attrs &environment env)
@@ -121,6 +130,7 @@
             `(error "@ doesn't provide accessing form, because this will break Python's reference counting."))))
 
 (defmacro code (options &body body)
+  "Run the CLPy code, optionally clear the state at the end."
   `(progn
      (unless (py:is-initialized) (py:initialize))
      ,@body

@@ -8,7 +8,7 @@ from os.path import join, dirname, realpath, expandvars
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'clpy'
+project = 'CLPy'
 copyright = '2025, Yiran Lu'
 author = 'Yiran Lu'
 release = '0.0.1'
@@ -26,13 +26,22 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- CL Domain customizatoin -------------------------------------------------
-cl_systems = [{
-    "name": "clpy",
-    "path": realpath(join(dirname(realpath(__file__)), "../")),
-    "packages": [
-        "clpy.bool"
-    ]
-}]
+cl_systems = [
+    {
+        "name": "clpy",
+        "path": realpath(join(dirname(realpath(__file__)), "../")),
+        "packages": [
+            "clpy.bool"
+        ]
+    },
+    {
+        "name": "clthon",
+        "path": realpath(join(dirname(realpath(__file__)), "../")),
+        "packages": [
+            "clthon"
+        ]
+    }
+]
 
 import sphinxcontrib.cldomain
 cldomain_exe = join(dirname(realpath(sphinxcontrib.cldomain.__file__)), "cldomain.ros")

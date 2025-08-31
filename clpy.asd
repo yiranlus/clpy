@@ -83,6 +83,20 @@
                              (:file "package" :depends-on ("util" "smart" "bytes" "str" "object" "interpreter" "exception" "import" "eval" "named-tuple" "c-function" "member")))))
   :in-order-to ((test-op (test-op "clpy/test"))))
 
+
+
+(asdf:defsystem "clpy/doc-exporter"
+  :description "Documentation generator for CLPy"
+  :version "0.1.0"
+  :author "Yiran Lu"
+  :license "MIT"
+  :depends-on ("clpy"
+               "clthon")
+  :components ((:module "doc-exporter"
+                :components ((:file "package"))))
+  :in-order-to ((doc-op (asdf:load-op "clpy/doc-exporter"))))
+
+
 (asdf:defsystem "clpy/test"
   :depends-on ("clpy"
                "cl-plus-c"

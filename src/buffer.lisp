@@ -1,6 +1,7 @@
 (defpackage :clpy.buffer
   (:nicknames :py.buf)
   (:use :cl :plus-c)
+  (:import-from :clpy.ffi #:py-buffer)
   (:export #:p
            #:buffer-buf
            #:buffer-obj
@@ -25,33 +26,48 @@
 
 ;; Py_buffer
 
+
 (defun buffer-buf (buf)
   (clpy.ffi.acc:py-buffer.buf buf))
+
+
 
 (defun buffer-obj (buf)
   (clpy.ffi.acc:py-buffer.obj buf))
 
+
+
 (defun buffer-len (buf)
   (clpy.ffi.acc:py-buffer.len buf))
+
+
 
 (defun buffer-readonly (buf)
   (plusp
    (clpy.ffi.acc:py-buffer.readonly buf)))
 
+
+
 (defun buffer-itemsize (buf)
   (clpy.ffi.acc:py-buffer.itemsize buf))
+
+
 
 (defun buffer-format (buf)
   (clpy.ffi.acc:py-buffer.format buf))
 
+
+
 (defun buffer-ndim (buf)
   (clpy.ffi.acc:py-buffer.ndim buf))
+
 
 (defun buffer-shape (buf)
   (c-let ((shape clpy.ffi:py-buffer
                  :from (clpy.ffi.acc:py-buffer.shape buf)))
     '(loop for i from 0 to (buffer-ndim buf)
-          collect (shape i))))
+      collect (shape i))))
+
 
 (defun buffer-strides (buf)
   (c-let ((shape clpy.ffi:py-buffer
@@ -59,11 +75,13 @@
     (loop for i from 0 to (buffer-ndim buf)
           collect (shape i))))
 
+
 (defun buffer-suboffsets (buf)
   (c-let ((shape clpy.ffi:py-buffer
                  :from (clpy.ffi.acc:py-buffer.suboffsets buf)))
     (loop for i from 0 to (buffer-ndim buf)
           collect (shape i))))
+
 
 (defun buffer-internal (buf)
   (clpy.ffi.acc:py-buffer.internal buf))
@@ -101,26 +119,49 @@
 
 ;; Buffer protocol
 
+
 (defun p (o)
+  "Check if the object ``O`` support the Buffer protocol."
   (plusp (clpy.ffi.fns:py-object-check-buffer o)))
 
+
 (defun get-buffer (o &rest flags)
+  "Get the buffer of the buffer of the PyObject.
+
+An optional FLAGS can be provide. Unlike PyObject_GetBuffer, you will get the
+Py_buffer pointer as a return function.
+
+You should use :cl:functoin:`release` to release the reference to the current
+view and use ``autowrap:free`` to free the allocated Py_Buffer object."
   (c-let ((view clpy.ffi:py-buffer))
     (clpy.util:ensure-zero
         (clpy.ffi.fns:py-object-get-buffer o view (apply #'make-flags flags))
       (clpy.exception:raise-generic-or-python-error))
     view))
 
+
 (defun release (view)
+  "Release the strong reference from VIEW.
+
+This should be used paired with :cl:function:`get-buffer`."
   (clpy.ffi.fns:py-buffer-release view)
   (autowrap:free view))
 
+
 (defun size-from-format (format)
+  "Return the implied itemsize from FORMAT.
+
+FORMAT should be a string."
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-buffer-size-from-format format)
     (clpy.exception:raise-generic-or-python-error)))
 
+
 (defun contiguous-p (view order)
+  "Check the order of the VIEW.
+
+ORDER should be one of ``:C``, ``:F`` or ``:ANY``, which means C-style order,
+Fortran-style order or either one."
   (plusp
    (let ((-order (case order
                    (:c (char-code #\C))
@@ -128,7 +169,12 @@
                    (:any (char-code #\A)))))
      (clpy.ffi.fns:py-buffer-is-contiguous view -order))))
 
+
 (defun get-pointer (view &rest indices)
+  "Get the memory area pointed to by the indices inside the given VIEW.
+
+INDECES are specified as a list of number. It cals ``PyBuffer_GetPointer``, but
+the indices array is dynamically allocated and destroyed after use."
   (let ((len (length indices))
         (ndim (buffer-ndim view))
         res)
@@ -142,7 +188,13 @@
         res
       (clpy.exception:raise-generic-or-python-error))))
 
-(defun copy (from to as-order &optional len)
+
+(defun copy (from to &optional (as-order :any) len)
+  "Copy the buffer from one to another.
+
+FROM and TO can be either PyObject, Py_Buffer or a pointer. AS-ORDER should be
+one of ``:C``, ``:F`` or ``:ANY``. LEN should be specified when you copy from
+a pointer"
   (let ((order (case as-order
                  (:c (char-code #\C))
                  (:f (char-code #\F))
@@ -158,7 +210,7 @@
                 (typep to 'clpy.ffi:py-buffer))
            (unless len
              (error 'clpy.exception:generic-error
-		    :message "LENGTH must be specified when copying from pointer."))
+                    :message "LENGTH must be specified when copying from pointer."))
            (when (eq as-order :any)
              (error ":ANY is not supported when copying from pointer"))
            (clpy.ffi.fns:py-buffer-from-contiguous to from len order))
@@ -166,10 +218,6 @@
                 (typep to 'clpy.ffi:py-object))
            (clpy.ffi.fns:py-object-copy-data to from))
           (t (error 'clpy.exception:generic-error
-		    :message (format nil "Copying data from TYPE ~A to ~A is not supported"
-				     (type-of from) (type-of to)))))
+                    :message (format nil "Copying data from TYPE ~A to ~A is not supported"
+                                     (type-of from) (type-of to)))))
       (clpy.exception:raise-generic-or-python-error))))
-
-
-
-      

@@ -8,11 +8,10 @@
 
 (in-package :clthon.examples)
 
-(sb-int:with-float-traps-masked (:divide-by-zero :invalid :overflow)
-  (clthon:code (:finalize nil)
-    (from (|numpy| :as np))))
-
 (code (:finalize t)
+  (sb-int:with-float-traps-masked (:divide-by-zero :invalid :overflow)
+    (from (|numpy| :as np)))
+
   (from (|matplotlib.pyplot| :as plt))
 
   (format t "figure.dpi: ~A~%" (@ 'plt |rcParams| ("figure.dpi")))
@@ -32,5 +31,5 @@
     (ncall (@ 'plt |ylabel|) ("y-axis"))
     (ncall (@ 'plt |title|) ("simple line plot"))
     (ncall (@ 'plt |legend|))
-    (ncall (@ 'plt |show|)))
-  )
+    (ncall (@ 'plt |show|))
+    ))

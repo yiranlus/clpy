@@ -1,24 +1,21 @@
-.. clpy documentation master file, created by
-   sphinx-quickstart on Fri Aug 22 21:41:56 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-clpy documentation
+==================
+CLPy Documentation
 ==================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+CLPy is a Common Lisp wrapper of `Python Limited API`_. It use `cl-autowrap`_ to
+generate the FFI bindings and then rewrap these functions to a more Lisper way.
+CLPy also comes with a :doc:`CLthon <clthon/index>`, which is a set of macros that
+facilitate writing Python-like scripts in Common Lisp.
 
-.. :cl:package:: clpy.bool
-.. :cl:function:: new
-   Some additional text.
+
+.. _`cl-autowrap`: https://github.com/rpav/cl-autowrap/
+.. _`Python Limited API`: https://docs.python.org/3.11/c-api/stable.html#limited-c-api
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   api
-
-
-
+   clpy/index
+   clthon/index
+   references/clpy/index
+   references/clthon/index
