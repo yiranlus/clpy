@@ -18,8 +18,8 @@
 (defun ob-type (obj)
   "Return ob_type of the PyObject or PyVarObject."
   (let ((pto (if (p obj)
-		 (clpy.ffi.acc:py-object.ob-type obj)
-		 (clpy.ffi.acc:py-var-object.ob-base.ob-type))))
+                 (clpy.ffi.acc:py-object.ob-type obj)
+                 (clpy.ffi.acc:py-var-object.ob-base.ob-type))))
     (or (clpy.type:from pto) pto)))
 
 (defun ob-base (vobj)
@@ -31,7 +31,7 @@
 (defun new-ref (o)
   "Create a strong reference to `O` and return it."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-new-ref o)))
+   (clpy.ffi.fns:py-new-ref o)))
 
 (clpy.smart:new-hook #'p #'new-ref)
 
@@ -50,7 +50,7 @@
 
 This is equivalent to Python's `Py_XNewRef`."
   (unless (or (null o)
-	      (cffi:null-pointer-p (autowrap:ptr o)))
+              (cffi:null-pointer-p (autowrap:ptr o)))
     (new-ref o)))
 
 (defun inc-xref (o)
@@ -58,15 +58,15 @@ This is equivalent to Python's `Py_XNewRef`."
 
 This equivalent to Python's `Py_XINCREF."
   (unless (or (null o)
-	      (cffi:null-pointer-p (autowrap:ptr o)))
+              (cffi:null-pointer-p (autowrap:ptr o)))
     (inc-ref o)))
 
 (defun dec-xref (o)
-    "Similar to :cl:function:`dec-ref`, but the object `O` can be NULL.
+  "Similar to :cl:function:`dec-ref`, but the object `O` can be NULL.
 
 This equivalent to Python's `Py_XDECCREF."
   (unless (or (null o)
-	      (cffi:null-pointer-p (autowrap:ptr o)))
+              (cffi:null-pointer-p (autowrap:ptr o)))
     (dec-ref o)))
 
 ;; Some hacks: Define None and NotImplemented
@@ -80,7 +80,7 @@ This equivalent to Python's `Py_XDECCREF."
   (new-ref +NONE+))
 
 (clpy.smart:new-hook #'(lambda (x) (eq x :none))
-		     #'(lambda (x) (none)))
+                     #'(lambda (x) (none)))
 
 (defparameter +NOT-IMPLEMENTED+
   (plus-c:c-ref
@@ -91,4 +91,4 @@ This equivalent to Python's `Py_XDECCREF."
   (new-ref +NOT-IMPLEMENTED+))
 
 (clpy.smart:new-hook #'(lambda (x) (eq x :not-implemented))
-		     #'(lambda (x) (not-implemented)))
+                     #'(lambda (x) (not-implemented)))

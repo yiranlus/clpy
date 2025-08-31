@@ -16,13 +16,13 @@
 
 The function signature is
 
-.. code-block:: c
+.. code:: c
 
    PyObject *PyCFunction(PyObject *self, PyObject *args)``.
 
 It is recommended to use fixed name for the arguments, for example
 
-.. code-block:: common-lisp
+.. code:: common-lisp
 
    (defcfunction my-cfunction (self args)
      (print 'do-some-thing))"
@@ -39,14 +39,14 @@ It is recommended to use fixed name for the arguments, for example
 
 The function signature is
 
-.. code-block:: c
+.. code:: c
 
    PyObject *PyCFunction(PyObject *self, PyObject *args,
                          PyObject *kwargs)``.
 
 It is recommended to use fixed name for the arguments, for example
 
-.. code-block:: common-lisp
+.. code:: common-lisp
 
    (defcfunction my-cfunction (self args kwargs)
      (print 'do-some-thing))"

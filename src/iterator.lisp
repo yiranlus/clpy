@@ -6,11 +6,11 @@
            #:next
            #:send
 
-	   #:seq-p
-	   #:seq-new
+           #:seq-p
+           #:seq-new
 
-	   #:call-p
-	   #:call-new))
+           #:call-p
+           #:call-new))
 
 (in-package :clpy.iterator)
 
@@ -24,16 +24,16 @@
 
 (defun next (iter)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-iter-next iter)
-    (clpy.exception:return-or-raise-python-error nil)))
+   (clpy.ffi.fns:py-iter-next iter)
+   (clpy.exception:return-or-raise-python-error nil)))
 
 (defun send (iter arg)
   (c-with ((presult (:pointer clpy.ffi:py-object)))
-    (let ((res (clpy.ffi.fns:py-iter-send iter arg (presult &))))
-      (match res
-        (clpy.ffi:+pygen-return+ (values res presult))
-        (clpy.ffi:+pygen-next+ (values res presult))
-        (clpy.ffi:+pygen-error+ nil)))))
+          (let ((res (clpy.ffi.fns:py-iter-send iter arg (presult &))))
+            (match res
+              (clpy.ffi:+pygen-return+ (values res presult))
+              (clpy.ffi:+pygen-next+ (values res presult))
+              (clpy.ffi:+pygen-error+ nil)))))
 
 
 (clpy.type:define-type "PySeqIter_Type" seq-iter)
@@ -44,8 +44,8 @@
 (defun seq-new (seq)
   "Return an iterator that works with a general sequence object."
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-seq-iter-new seq)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-seq-iter-new seq)
+   (clpy.exception:raise-generic-or-python-error)))
 
 
 (clpy.type:define-type "PyCallIter_Type" call-iter)

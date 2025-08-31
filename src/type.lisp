@@ -3,29 +3,29 @@
   (:use :cl :plus-c)
   (:shadow :get)
   (:export #:*assoc-types*
-	   #:define-type
-	   #:define-type-from
-	   #:from
-	   #:get
-	   #:of
-	   #:+PY-LT+
-	   #:+PY-LE+
-	   #:+PY-EQ+
-	   #:+PY-NE+
-	   #:+PY-GT+
-	   #:+PY-GE+
+           #:define-type
+           #:define-type-from
+           #:from
+           #:get
+           #:of
+           #:+PY-LT+
+           #:+PY-LE+
+           #:+PY-EQ+
+           #:+PY-NE+
+           #:+PY-GT+
+           #:+PY-GE+
 
-	   #:p
-	   #:clear-cache
-	   #:get-flags
-	   #:modified
-	   #:subtype-p
-	   #:get-name
-	   #:get-qual-name
-	   #:get-module
-	   #:get-module-state
+           #:p
+           #:clear-cache
+           #:get-flags
+           #:modified
+           #:subtype-p
+           #:get-name
+           #:get-qual-name
+           #:get-module
+           #:get-module-state
 
-	   #:ready))
+           #:ready))
 
 (in-package :clpy.type)
 
@@ -50,7 +50,7 @@
 
 (defmacro define-type (cname name)
   (let* ((name-str (symbol-name name))
-	 (kw-sym (intern name-str :keyword)))
+         (kw-sym (intern name-str :keyword)))
     `(push (cons ,kw-sym (cffi:foreign-symbol-pointer ,cname)) *assoc-types*)))
 
 (defun define-type-from (type-obj name)
@@ -80,7 +80,7 @@ is automatically upper-cased."
 (defun p (o)
   (or (clpy.type:of o :type)
       (clpy.type:subtype-p (clpy.object:ob-type o)
-			    (clpy.type:get :type))))
+                           (clpy.type:get :type))))
 
 (defun exact-p (o)
   (clpy.type:of o :type))
@@ -100,36 +100,36 @@ is automatically upper-cased."
   "Return ``T`` if TYPE-A is a subtype of TYPE-B."
   (plusp
    (clpy.util:ensure-non-negative
-       (let ((-type-a (if (keywordp type-a)
-			  (get type-a)
-			  type-a))
-	     (-type-b (if (keywordp type-b)
-			  (get type-b)
-			  type-b)))
-	 (clpy.ffi.fns:py-type-is-subtype -type-a -type-b))
-     (clpy.exception:raise-generic-or-python-error))))
+    (let ((-type-a (if (keywordp type-a)
+                       (get type-a)
+                       type-a))
+          (-type-b (if (keywordp type-b)
+                       (get type-b)
+                       type-b)))
+      (clpy.ffi.fns:py-type-is-subtype -type-a -type-b))
+    (clpy.exception:raise-generic-or-python-error))))
 
 ;; Properties
 
 (defun get-name (type)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-type-get-name type)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-type-get-name type)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun get-qual-name (type)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-type-get-qual-name type)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-type-get-qual-name type)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun get-module (type)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-type-get-module type)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-type-get-module type)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun get-module-state (type)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-type-get-module-state type)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-type-get-module-state type)
+   (clpy.exception:raise-generic-or-python-error)))
 
 ;; Create New Type
 

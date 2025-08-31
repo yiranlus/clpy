@@ -40,10 +40,23 @@
       (clpy.type:subtype-p (clpy.object:ob-type o)
                            (clpy.type:get :dict))))
 
+
 (defun exact-p (o)
   (clpy.type:of o :dict))
 
+
 (defun new (&rest mapping)
+  "Create a new dict object from MAPPING.
+
+Each entry should be a cons, i.e., (key . value). For example, you can create a
+dict using following code.
+
+.. code:: common-lisp
+
+   (py:let ((a-dict (py.dict:new ("key-1" . "value-1")
+                                 ("key-2" . "value-2")))))
+
+CLPy will automatically create an PyObject for each key and values."
   (let ((dict (clpy.util:ensure-null-as-nil
                   (clpy.ffi.fns:py-dict-new)
                 (error 'py.exc:generic-error :message "Unable to create new dict."))))
@@ -59,13 +72,16 @@
 (clpy.smart:new-hook #'(lambda (x) (and (listp x) (eq :dict (car x))))
                      #'(lambda (x) (apply #'new (cdr x))))
 
+
 (defun proxy-new (mapping)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-proxy-new mapping)
     (error 'py.exc:generic-error)))
 
+
 (defun clear (dict)
   (clpy.ffi.fns:py-dict-clear dict))
+
 
 (defun contains (dict key)
   (case (clpy.util:let ((-key (clpy.smart:new key)))
@@ -74,10 +90,12 @@
     (0 nil)
     (-1 (clpy.exception:raise-generic-or-python-error))))
 
+
 (defun copy (dict)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-copy dict)
     (clpy.exception:raise-generic-or-python-error)))
+
 
 (defun set-item (dict key value)
   (clpy.util:ensure-non-negative
@@ -89,6 +107,7 @@
             (clpy.ffi.fns:py-dict-set-item dict -key -value)))
     (clpy.exception:raise-generic-or-python-error)))
 
+
 (defun del-item (dict key)
   (clpy.util:ensure-non-negative
       (if (stringp key)
@@ -96,6 +115,7 @@
           (clpy.util:let ((-key (clpy.smart:new key)))
             (clpy.ffi.fns:py-dict-del-item dict -key)))
     (clpy.exception:raise-generic-or-python-error)))
+
 
 (defun get-item (dict key &optional suppress-error)
   (clpy.util:ensure-null-as-nil
@@ -107,28 +127,34 @@
             (clpy.ffi.fns:py-dict-get-item-with-error dict -key)))
     (clpy.exception:raise-generic-or-python-error)))
 
+
 (defun items (dict)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-items dict)
     (clpy.exception:raise-generic-or-python-error)))
+
 
 (defun keys (dict)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-keys dict)
     (clpy.exception:raise-generic-or-python-error)))
 
+
 (defun values (dict)
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-dict-values dict)
     (clpy.exception:raise-generic-or-python-error)))
+
 
 (defun len (dict)
   (clpy.util:ensure-non-negative
       (clpy.ffi.fns:py-dict-size dict)
     (clpy.exception:raise-generic-or-python-error)))
 
+
 (defun size (dict)
   (len dict))
+
 
 (defun merge (dict-a dict-or-seq &key override)
   (clpy.util:ensure-zero
@@ -142,6 +168,7 @@
                     :message (format nil "Unsupported tyep ~A to merge in dict."
                                      (type-of dict-or-seq))))))
     (clpy.exception:raise-generic-or-python-error)))
+
 
 (defun update (dict new-dict &key override)
   (clpy.util:ensure-zero

@@ -3,15 +3,15 @@
   (:use :cl)
   (:shadow #:get)
   (:export #:state-new
-	   #:state-get
-	   #:state-get-id
-	   #:state-get-dict
-	   #:state-get-frame
-	   #:state-get-interpreter
-	   #:state-swap
-	   #:state-clear
-	   #:state-delete
-	   #:state-set-async-exc))
+           #:state-get
+           #:state-get-id
+           #:state-get-dict
+           #:state-get-frame
+           #:state-get-interpreter
+           #:state-swap
+           #:state-clear
+           #:state-delete
+           #:state-set-async-exc))
 
 (in-package :clpy.thread)
 
@@ -26,11 +26,11 @@
 
 (defun state-get-dict ()
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-thread-state-get-dict)))
+   (clpy.ffi.fns:py-thread-state-get-dict)))
 
 (defun state-get-frame (tstate)
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-thread-state-get-frame tstate)))
+   (clpy.ffi.fns:py-thread-state-get-frame tstate)))
 
 (defun state-get-id (tstate)
   (clpy.ffi.fns:py-thread-state-get-id tstate))

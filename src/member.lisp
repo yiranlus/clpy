@@ -2,9 +2,9 @@
   (:nicknames :py.mbr)
   (:use :cl :plus-c)
   (:export #:defgetter
-	   #:defsetter
-	   #:new-get-set-def
-	   #:free-registry))
+           #:defsetter
+           #:new-get-set-def
+           #:free-registry))
 
 (in-package :clpy.member)
 
@@ -26,8 +26,8 @@ It is recommended to use fixed name for the arguments, for example
   (when (not (= 2 (length lambda-list)))
     (error "The lambda-list should have exactly two argument."))
   `(autowrap:defcallback ,name clpy.ffi:py-object
-       ((,(first lambda-list) clpy.ffi:py-object)
-	(,(second lambda-list) :pointer))
+     ((,(first lambda-list) clpy.ffi:py-object)
+      (,(second lambda-list) :pointer))
      ,@body))
 
 (defmacro defsetter (name lambda-list &body body)
@@ -47,11 +47,11 @@ It is recommended to use fixed name for the arguments, for example
      (print 'do-some-thing))"
   (when (not (= 3 (length lambda-list)))
     (error 'clpy.exception:generic-error
-	   :message "The lambda-list should have exactly two argument."))
+           :message "The lambda-list should have exactly two argument."))
   `(autowrap:defcallback ,name :int
-       ((,(first lambda-list) clpy.ffi:py-object)
-	(,(second lambda-list) clpy.ffi:py-object)
-	(,(third lambda-list) :pointer))
+     ((,(first lambda-list) clpy.ffi:py-object)
+      (,(second lambda-list) clpy.ffi:py-object)
+      (,(third lambda-list) :pointer))
      ,@body))
 
 (defparameter *get-set-def-registry* '())
@@ -60,12 +60,12 @@ It is recommended to use fixed name for the arguments, for example
   (unless getter
     (error "Getter cannot be NIL"))
   (c-let ((get-set-def clpy.ffi:py-get-set-def))
-    (setf (get-set-def :name) name
-	  (get-set-def :get) getter
-	  (get-set-def :set) setter
-	  (get-set-def :doc) doc
-	  (get-set-def :closure) closure)
-    get-set-def))
+         (setf (get-set-def :name) name
+               (get-set-def :get) getter
+               (get-set-def :set) setter
+               (get-set-def :doc) doc
+               (get-set-def :closure) closure)
+         get-set-def))
 
 
 ;; PyMemberDef

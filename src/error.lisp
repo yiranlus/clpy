@@ -4,9 +4,9 @@
   "Test whether the error indicator is set.
 
 If set, return the exception TYPE. You not own a reference to the
-return value, so you do not need to PY:DEC-REF it."
+return value, so you do not need to :cl:function:`py:dec-ref` it."
   (clpy.exception:from (clpy.util:ensure-null-as-nil
-			   (clpy.ffi.fns:py-err-occurred))))
+                        (clpy.ffi.fns:py-err-occurred))))
 
 
 (defun print (&optional (set-sys-last-vars 1) &rest rest &key (capture nil))
@@ -17,7 +17,7 @@ will case a fatal error. If CAPTURE is ``T``, the printed error will
 be return as a string."
   (if capture
       (with-stderr-captured
-	(clpy.ffi.fns:py-err-print-ex set-sys-last-vars))
+          (clpy.ffi.fns:py-err-print-ex set-sys-last-vars))
       (clpy.ffi.fns:py-err-print-ex set-sys-last-vars)))
 
 
@@ -40,35 +40,35 @@ If the error indicator is not set, there is no effect."
 (defun set (type &optional (message nil))
   "Set the error indicator either by a string supplied by CONTENT or an object."
   (let ((-type (if (keywordp type)
-		   (plus-c:c-ref (clpy.exception:get :type)
-				 clpy.ffi:py-object)
-		   type)))
+                   (plus-c:c-ref (clpy.exception:get :type)
+                                 clpy.ffi:py-object)
+                   type)))
     (cond
       ((null message) (clpy.ffi.fns:py-err-set-none -type))
       ((stringp message) (clpy.ffi.fns:py-err-set-string -type message))
       (t (clpy.ffi.fns:py-err-set-object -type message)))))
 
 (defun set-from-errno (type &optional
-			      (filename nil filename-p)
-			      (filename2 nil filename2-p))
+                              (filename nil filename-p)
+                              (filename2 nil filename2-p))
   "Convenience function to raise an exception when a C library function has
 returned an error and set the C variable errno."
   (let ((-type (if (keywordp type)
-		   (plus-c:c-ref (clpy.exception:get :type)
-				 clpy.ffi:py-object)
-		   type)))
+                   (plus-c:c-ref (clpy.exception:get :type)
+                                 clpy.ffi:py-object)
+                   type)))
     (cond
       (filename2-p (clpy.util:let ((-filename (if (clpy.object:p filename)
-						  (clpy.object:new-ref filename)
-						  (clpy.str:new filename)))
-				   (-filename2 (if (clpy.object:p filename2)
-						   (clpy.object:new-ref filename2)
-						   (clpy.str:new filename2))))
-		     (clpy.ffi.fns:py-err-set-from-errno-with-filename-objects
-		      -type -filename -filename2)))
+                                                  (clpy.object:new-ref filename)
+                                                  (clpy.str:new filename)))
+                                   (-filename2 (if (clpy.object:p filename2)
+                                                   (clpy.object:new-ref filename2)
+                                                   (clpy.str:new filename2))))
+                     (clpy.ffi.fns:py-err-set-from-errno-with-filename-objects
+                      -type -filename -filename2)))
       (filename-p (if (stringp filename)
-		      (clpy.ffi.fns:py-err-set-from-errno-with-filename -type filename)
-		      (clpy.ffi.fns:py-err-set-from-errno-with-filename-object -type filename)))
+                      (clpy.ffi.fns:py-err-set-from-errno-with-filename -type filename)
+                      (clpy.ffi.fns:py-err-set-from-errno-with-filename-object -type filename)))
       (t (clpy.ffi.fns:py-err-set-from-errno -type)))))
 
 
@@ -87,17 +87,17 @@ returned an error and set the C variable errno."
 ;;Issuing warnings
 
 (defun warn (message &key
-			  category
-			  (stack-level 1)
-			  (filename nil filename-p) lineno module registry)
+                       category
+                       (stack-level 1)
+                       (filename nil filename-p) lineno module registry)
   (clpy.util:ensure-zero
-      (if (filename-p)
-      (if lineno
-	  (clpy.ffi.fns:py-err-warn-explicit category message filename lineno module registry)
-	  (error 'clpy.exception:generic-error "Need LINENO for CLPY.ERR:WARN"))
-      (clpy.ffi.fns:py-err-warn-ex category message stack-level))
-    (clpy.exception:raise-generic-or-python-error
-     :message "Error encountered when issuing warning.")))
+   (if (filename-p)
+       (if lineno
+           (clpy.ffi.fns:py-err-warn-explicit category message filename lineno module registry)
+           (error 'clpy.exception:generic-error "Need LINENO for CLPY.ERR:WARN"))
+       (clpy.ffi.fns:py-err-warn-ex category message stack-level))
+   (clpy.exception:raise-generic-or-python-error
+    :message "Error encountered when issuing warning.")))
 
 ;;Query the error indicator
 
@@ -113,26 +113,26 @@ one."
        (clpy.ffi.fns:py-err-given-exception-matches given exc)
        (clpy.ffi.fns:py-err-exception-matches exc))))
 
-  
+
 (defun fetch ()
   "Retrieve the error indicator.
 
 The retrieved objects will be automatically normalized."
   (c-with ((ptype (:pointer clpy.ffi:py-object))
-	   (pvalue (:pointer clpy.ffi:py-object))
-	   (ptrackback (:pointer clpy.ffi:py-object)))
-    (clpy.ffi.fns:py-err-fetch (ptype &) (pvalue &) (ptrackback &))
-    (clpy.ffi.fns:py-err-normalize-exception (ptype &) (pvalue &) (ptrackback &))
-    (values (clpy.util:ensure-null-as-nil (ptype *))
-	    (clpy.util:ensure-null-as-nil (pvalue *))
-	    (clpy.util:ensure-null-as-nil (ptrackback *)))))
+           (pvalue (:pointer clpy.ffi:py-object))
+           (ptrackback (:pointer clpy.ffi:py-object)))
+          (clpy.ffi.fns:py-err-fetch (ptype &) (pvalue &) (ptrackback &))
+          (clpy.ffi.fns:py-err-normalize-exception (ptype &) (pvalue &) (ptrackback &))
+          (values (clpy.util:ensure-null-as-nil (ptype *))
+                  (clpy.util:ensure-null-as-nil (pvalue *))
+                  (clpy.util:ensure-null-as-nil (ptrackback *)))))
 
 (defun restore (type value trackback)
   (clpy.ffi.fns:py-err-restore type value trackback))
 
 (defun get-handled-exception ()
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-err-get-handled-exception)))
+   (clpy.ffi.fns:py-err-get-handled-exception)))
 
 (defun set-handled-exception (exc)
   "Set the active exception.
@@ -144,9 +144,9 @@ To clear the exception, pass NIL."
 
 (defun check-signals ()
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-err-check-signals)
-    (clpy.exception:raise-generic-or-python-error
-     :message "Error encountered when calling CHECK-SIGNALS.")))
+   (clpy.ffi.fns:py-err-check-signals)
+   (clpy.exception:raise-generic-or-python-error
+    :message "Error encountered when calling CHECK-SIGNALS.")))
 
 (defun set-interrupt (&optional signum)
   "Simulate the effect of a signal arriving.
@@ -154,9 +154,8 @@ To clear the exception, pass NIL."
 Without SIGNUM specified, the signal SIGINT will be sent. To get the
 value of other signals, you can use SB-POSIX:SIG<NAME>."
   (clpy.util:ensure-zero
-      (if signum
-	  (clpy.ffi.fns:py-err-set-interrupt)
-	  (clpy.ffi.fns:py-err-set-interrupt-ex signum))
-    (clpy.exception:raise-generic-or-python-error
-     :message "Error encountered when calling SET-INTERRUPT.")))
-
+   (if signum
+       (clpy.ffi.fns:py-err-set-interrupt)
+       (clpy.ffi.fns:py-err-set-interrupt-ex signum))
+   (clpy.exception:raise-generic-or-python-error
+    :message "Error encountered when calling SET-INTERRUPT.")))

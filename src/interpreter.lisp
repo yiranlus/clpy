@@ -73,16 +73,16 @@ otherwise NIL."
 (defun encode-locale (text)
   "Encode a wide character string to the filesystem encoding."
   (c-with ((error-pos clpy.ffi:size-t))
-    (multiple-value-bind (res ptr)
-        (clpy.ffi.fns:py-encode-locale text (error-pos &))
-      (unless (cffi:null-pointer-p ptr)
-        (clpy.ffi.fns:py-mem-free ptr))
-      res)))
+          (multiple-value-bind (res ptr)
+              (clpy.ffi.fns:py-encode-locale text (error-pos &))
+            (unless (cffi:null-pointer-p ptr)
+              (clpy.ffi.fns:py-mem-free ptr))
+            res)))
 
 (defun decode-locale (arg)
   "Reverse of :cl:function:`encode-locale`"
   (c-with ((error-pos clpy.ffi:size-t))
-    (clpy.ffi.fns:py-decode-locale arg (error-pos &))))
+          (clpy.ffi.fns:py-decode-locale arg (error-pos &))))
 
 ;; Process-wide parameters
 
@@ -160,8 +160,8 @@ of the current Python interpreter instance."
 (defun enter-recursive-call (where)
   "Marks a point where a recursive C-level call is about to be performed."
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-enter-recursive-call where)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-enter-recursive-call where)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun leave-recursive-call ()
   (clpy.ffi.fns:py-leave-recursive-call))
@@ -169,8 +169,8 @@ of the current Python interpreter instance."
 
 (defun repr-enter (obj)
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-repr-enter obj)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-repr-enter obj)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun repr-leave (obj)
   (clpy.ffi.fns:py-repr-leave))
@@ -216,9 +216,9 @@ The function should be a void function without argument."
 
 (defun new-interpreter ()
   (clpy.util:ensure-null-as-nil
-      (clpy.ffi.fns:py-new-interpreter)
-    (error 'clpy.exception:generic-error
-           :message "Failed to create a sub-interpreter.")))
+   (clpy.ffi.fns:py-new-interpreter)
+   (error 'clpy.exception:generic-error
+          :message "Failed to create a sub-interpreter.")))
 
 (defun end-interpreter (tstate)
   "Destroy the (sub-)interpreter reprensted by the given thread state."
@@ -231,10 +231,10 @@ The function should be a void function without argument."
 
 FUNC should have signature ``int (void *)`` and ARG is a ``void*``."
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-add-pending-call func arg)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-add-pending-call func arg)
+   (clpy.exception:raise-generic-or-python-error)))
 
 (defun make-pending-calls ()
   (clpy.util:ensure-zero
-      (clpy.ffi.fns:py-make-pending-calls)
-    (clpy.exception:raise-generic-or-python-error)))
+   (clpy.ffi.fns:py-make-pending-calls)
+   (clpy.exception:raise-generic-or-python-error)))

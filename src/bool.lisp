@@ -8,14 +8,14 @@
 
 (clpy.type:define-type "PyBool_Type" bool)
 
-
 (defun p (o)
-  "Check if the object ``O`` is of boolean type."
   (clpy.type:of o :bool))
 
 
 (defun new (&optional (v nil))
-  "Create a new bool from value ``V``."
+  "Create a new bool from value ``V``.
+
+``V`` can be any value, but it will be evaluated to ``T`` or NIL."
   (clpy.util:ensure-null-as-nil
       (clpy.ffi.fns:py-bool-from-long (if v 1 0))
     (error 'py.exc:generic-error)))

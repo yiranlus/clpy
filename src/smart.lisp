@@ -23,6 +23,11 @@ PRED returns t, NEW-FUNC takes that argument to create a new value."
 (new-hook #'null (lambda (x) nil))
 
 (defun new (x)
+  "Create a new PyObject depends on ``X``.
+
+A list of predictors registered by :cl:function:`new-hook` will be applied on
+``X`` and the corresponding creation function will be applied to ``X`` for the
+first predictor that return ``T``."
   (when (clpy.object:p x)
     (return-from new (clpy.object:new-ref x)))
   (loop for (pred . new-func) in *new-mapping*
@@ -39,12 +44,12 @@ PRED returns t, NEW-FUNC takes that argument to create a new value."
   (push (cons pred print-func) *print-mapping*))
 
 (defun print (x &optional (stream *standard-output*))
+  "Similar to :cl:function:`new`, but used for print the object."
   (loop for (pred . print-func) in *print-mapping*
-	when (funcall pred x)
-	  do (return-from print
-	       (values t
-		       (let ((res (funcall print-func x)))
-			 (if *print-escape*
-			     (format stream "~S" res)
-			     (format stream "~A" res)))))))
-
+        when (funcall pred x)
+          do (return-from print
+               (values t
+                       (let ((res (funcall print-func x)))
+                         (if *print-escape*
+                             (format stream "~S" res)
+                             (format stream "~A" res)))))))
