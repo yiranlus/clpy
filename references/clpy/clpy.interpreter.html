@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CLPY.INTERPRETER &#8212; CLPy 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CLPY.ITERATOR" href="clpy.iterator.html" />
+    <link rel="prev" title="CLPY.IMPORT" href="clpy.import.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="clpy-interpreter">
+<h1>CLPY.INTERPRETER<a class="headerlink" href="#clpy-interpreter" title="Link to this heading">¶</a></h1>
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-compiler">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-compiler</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-compiler" title="Link to this definition">¶</a></dt>
+<dd><p>Return an indication of the compiler used to build the current
+Python version.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:initialize">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">initialize</span></span> <span class="lambda_keyword k"><span class="pre">&amp;optional</span></span><span class="w"> </span> (<em><span class="pre">initsigs</span></em><span class="w"> </span> <em><span class="pre">t</span></em>))<a class="headerlink" href="#function:clpy.interpreter:initialize" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the Python interpreter. If <code class="docutils literal notranslate"><span class="pre">INITSIGS</span></code> is set to NIL, it
+skips initialization registration of signal handlers, which migh be
+useful when Python is embedded.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:finalize">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">finalize</span></span>)<a class="headerlink" href="#function:clpy.interpreter:finalize" title="Link to this definition">¶</a></dt>
+<dd><p>Undo all initializations and subsequent use of Python/C API
+functions, and destroy all sub-interpreters that were created and not
+yet destroyed since the last call to INITILIZE. Return t normally,
+otherwise NIL.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:exit">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">exit</span></span> <em><span class="pre">status</span></em>)<a class="headerlink" href="#function:clpy.interpreter:exit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:at-exit">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">at-exit</span></span> <em><span class="pre">func</span></em>)<a class="headerlink" href="#function:clpy.interpreter:at-exit" title="Link to this definition">¶</a></dt>
+<dd><p>Call a function at exit.</p>
+<p>The function should be a void function without argument.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:end-interpreter">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">end-interpreter</span></span> <em><span class="pre">tstate</span></em>)<a class="headerlink" href="#function:clpy.interpreter:end-interpreter" title="Link to this definition">¶</a></dt>
+<dd><p>Destroy the (sub-)interpreter reprensted by the given thread state.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-get">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-get</span></span>)<a class="headerlink" href="#function:clpy.interpreter:state-get" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-new">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-new</span></span>)<a class="headerlink" href="#function:clpy.interpreter:state-new" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-copyright">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-copyright</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-copyright" title="Link to this definition">¶</a></dt>
+<dd><p>Return the official copyright string for the current Python
+version.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:fatal-error">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">fatal-error</span></span> <em><span class="pre">message</span></em>)<a class="headerlink" href="#function:clpy.interpreter:fatal-error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-build-info">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-build-info</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-build-info" title="Link to this definition">¶</a></dt>
+<dd><p>Return information about the sequence number and build date and time
+of the current Python interpreter instance.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:decode-locale">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">decode-locale</span></span> <em><span class="pre">arg</span></em>)<a class="headerlink" href="#function:clpy.interpreter:decode-locale" title="Link to this definition">¶</a></dt>
+<dd><p>Reverse of <a class="reference internal" href="#function:clpy.interpreter:encode-locale" title="clpy.interpreter:encode-locale"><code class="xref cl cl-function docutils literal notranslate"><span class="pre">encode-locale</span></code></a></p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-program-name">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-program-name</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-program-name" title="Link to this definition">¶</a></dt>
+<dd><p>Return the program name set with <a class="reference internal" href="#function:clpy.interpreter:set-program-name" title="clpy.interpreter:set-program-name"><code class="xref cl cl-symbol docutils literal notranslate"><span class="pre">SET-PROGRAM-NAME</span></code></a>.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-version">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-version</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-version" title="Link to this definition">¶</a></dt>
+<dd><p>Return the version of this Python interpreter.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-get-dict">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-get-dict</span></span> <em><span class="pre">interp</span></em>)<a class="headerlink" href="#function:clpy.interpreter:state-get-dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-delete">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-delete</span></span> <em><span class="pre">interp</span></em>)<a class="headerlink" href="#function:clpy.interpreter:state-delete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:set-program-name">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">set-program-name</span></span> <em><span class="pre">name</span></em>)<a class="headerlink" href="#function:clpy.interpreter:set-program-name" title="Link to this definition">¶</a></dt>
+<dd><p>Set the program name.</p>
+<p>Deprecated since Python 3.11.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:enter-recursive-call">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">enter-recursive-call</span></span> <em><span class="pre">where</span></em>)<a class="headerlink" href="#function:clpy.interpreter:enter-recursive-call" title="Link to this definition">¶</a></dt>
+<dd><p>Marks a point where a recursive C-level call is about to be performed.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-recursion-limit">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-recursion-limit</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-recursion-limit" title="Link to this definition">¶</a></dt>
+<dd><p>Return the recursion limit.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:leave-recursive-call">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">leave-recursive-call</span></span>)<a class="headerlink" href="#function:clpy.interpreter:leave-recursive-call" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-clear">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-clear</span></span> <em><span class="pre">interp</span></em>)<a class="headerlink" href="#function:clpy.interpreter:state-clear" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:repr-leave">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">repr-leave</span></span> <em><span class="pre">obj</span></em>)<a class="headerlink" href="#function:clpy.interpreter:repr-leave" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-prefix">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-prefix</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-prefix" title="Link to this definition">¶</a></dt>
+<dd><p>Return the prefix for installed platform-independent files.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:add-pending-call">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">add-pending-call</span></span> <em><span class="pre">func</span></em><span class="w"> </span> <em><span class="pre">arg</span></em>)<a class="headerlink" href="#function:clpy.interpreter:add-pending-call" title="Link to this definition">¶</a></dt>
+<dd><p>Schedule a function to be called later.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FUNC</span></code> should have signature <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">(void</span> <span class="pre">*)</span></code> and <code class="docutils literal notranslate"><span class="pre">ARG</span></code> is a <code class="docutils literal notranslate"><span class="pre">void*</span></code>.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-exec-prefix">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-exec-prefix</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-exec-prefix" title="Link to this definition">¶</a></dt>
+<dd><p>Return the exec-prefix for installed platform-dependent files.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:repr-enter">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">repr-enter</span></span> <em><span class="pre">obj</span></em>)<a class="headerlink" href="#function:clpy.interpreter:repr-enter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-platform">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-platform</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-platform" title="Link to this definition">¶</a></dt>
+<dd><p>Return the platform identifier for the current platform.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-path">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-path</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-path" title="Link to this definition">¶</a></dt>
+<dd><p>Return the default module search path.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:is-initialized">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">is-initialized</span></span>)<a class="headerlink" href="#function:clpy.interpreter:is-initialized" title="Link to this definition">¶</a></dt>
+<dd><p>Return <a class="reference external" href="http://www.lispworks.com/reference/HyperSpec/Body/a_t.htm" title="(in Hyperspec)"><code class="docutils literal notranslate"><span class="pre">T</span></code></a> when the Python interpreter has been initialized, NIL if
+not.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:main">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">main</span></span> <em><span class="pre">argv</span></em>)<a class="headerlink" href="#function:clpy.interpreter:main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:state-get-id">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">state-get-id</span></span> <em><span class="pre">interp</span></em>)<a class="headerlink" href="#function:clpy.interpreter:state-get-id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:new-interpreter">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">new-interpreter</span></span>)<a class="headerlink" href="#function:clpy.interpreter:new-interpreter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:encode-locale">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">encode-locale</span></span> <em><span class="pre">text</span></em>)<a class="headerlink" href="#function:clpy.interpreter:encode-locale" title="Link to this definition">¶</a></dt>
+<dd><p>Encode a wide character string to the filesystem encoding.</p>
+</dd></dl>
+
+<dl class="cl function">
+<dt class="sig sig-object cl" id="function:clpy.interpreter:get-program-full-path">
+<em class="property"><span class="pre">Function</span> </em> (<span class="sig-name descname"><span class="pre">get-program-full-path</span></span>)<a class="headerlink" href="#function:clpy.interpreter:get-program-full-path" title="Link to this definition">¶</a></dt>
+<dd><p>Return the full program name of the Python executable.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">CLPy</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../clpy/index.html">CLPy Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../clthon/index.html">The CLthon Language</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CLPy Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="clpy.bool.html">CLPY.BOOL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.buffer.html">CLPY.BUFFER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.byte-array.html">CLPY.BYTE-ARRAY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.bytes.html">CLPY.BYTES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.c-function.html">CLPY.C-FUNCTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.capsule.html">CLPY.CAPSULE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.codec.html">CLPY.CODEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.descriptor.html">CLPY.DESCRIPTOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.dict.html">CLPY.DICT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.ellipsis.html">CLPY.ELLIPSIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.error.html">CLPY.ERROR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.eval.html">CLPY.EVAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.exception.html">CLPY.EXCEPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.file.html">CLPY.FILE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.frame.html">CLPY.FRAME</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.gc.html">CLPY.GC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.gil.html">CLPY.GIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.import.html">CLPY.IMPORT</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CLPY.INTERPRETER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.iterator.html">CLPY.ITERATOR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.library.html">CLPY.LIBRARY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.list.html">CLPY.LIST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.mapping.html">CLPY.MAPPING</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.member.html">CLPY.MEMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.memory.html">CLPY.MEMORY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.memory-view.html">CLPY.MEMORY-VIEW</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.module.html">CLPY.MODULE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.named-tuple.html">CLPY.NAMED-TUPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.number.html">CLPY.NUMBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.object.html">CLPY.OBJECT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.os.html">CLPY.OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.sequence.html">CLPY.SEQUENCE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.set.html">CLPY.SET</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.slice.html">CLPY.SLICE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.smart.html">CLPY.SMART</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.state.html">CLPY.STATE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.str.html">CLPY.STR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.system.html">CLPY.SYSTEM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.thread.html">CLPY.THREAD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.traceback.html">CLPY.TRACEBACK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.tuple.html">CLPY.TUPLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.type.html">CLPY.TYPE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.util.html">CLPY.UTIL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.weakref.html">CLPY.WEAKREF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clpy.wrapper.html">CLPY.WRAPPER</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../clthon/clthon.html">CLTHON</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">CLPy Reference</a><ul>
+      <li>Previous: <a href="clpy.import.html" title="previous chapter">CLPY.IMPORT</a></li>
+      <li>Next: <a href="clpy.iterator.html" title="next chapter">CLPY.ITERATOR</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Yiran Lu.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.3.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/references/clpy/clpy.interpreter.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
