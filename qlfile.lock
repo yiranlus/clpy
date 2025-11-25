@@ -22,7 +22,7 @@
  (:class qlot/source/ql:source-ql
   :initargs (:%version :latest)
   :version "ql-2025-06-22"))
-("cl-heredoc" .
+("trivial-features" .
  (:class qlot/source/ql:source-ql
   :initargs (:%version :latest)
-  :version "ql-2022-07-07"))
+  :version "ql-2025-06-22"))

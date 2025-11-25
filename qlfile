@@ -3,4 +3,3 @@ ql alexandria
 ql trivia
 ql log4cl
 ql cffi
-ql cl-heredoc
