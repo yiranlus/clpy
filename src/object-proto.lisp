@@ -108,13 +108,6 @@ the class CLS, otherwise return 0. CLS can be keyword registered in
       (0 nil)
       (-1 (clpy.exception:raise-generic-or-python-error)))))
 
-(defun is (o1 o2)
-  "Test if the object O1 is the object O2.
-
-This is equivalent to ``o1 is o2`` in Python."
-  (plusp (clpy.ffi.fns:py-is o1 o2)))
-
-
 (defun true-p (o &key (exact nil))
   "Test if ``O`` is True.
 
@@ -151,6 +144,12 @@ O1 should be an PyObject. O2 can be another PyObject, :NONE, :TRUE or :FALSE."
     (:false (false-p o2))
     (otherwise (cffi:pointer-eq (autowrap:ptr o1)
                                 (autowrap:ptr o2)))))
+
+;;(defun is (o1 o2)
+;;  "Test if the object O1 is the object O2.
+;;
+;;This is equivalent to ``o1 is o2`` in Python."
+;;  (plusp (clpy.ffi.fns:py-is o1 o2)))
 
 
 (defun not (o)
